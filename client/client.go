@@ -155,6 +155,8 @@ func (c *Client) handle(netconn net.Conn) {
 					}
 					c.setConn(netconn)
 					go c.heartbeat()
+				} else {
+					c.parse(p)
 				}
 
 				buf.Reset()
@@ -179,6 +181,24 @@ func (c *Client) heartbeat() {
 			return
 		}
 	}
+}
+
+func (c *Client) parse(p *packet.Packet) {
+	switch p.Type {
+	case packet.Type_Pong:
+		break
+	case packet.Type_Body:
+		c.body(p)
+	}
+}
+
+func (c *Client) body(p *packet.Packet) {
+	f, err := c.route.Get(p.RouteId)
+	if err != nil {
+		log.L().Error(err.Error())
+		return
+	}
+	f(context.Background(), p.Body)
 }
 
 func (c *Client) getConn() net.Conn {
