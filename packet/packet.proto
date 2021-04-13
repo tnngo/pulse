@@ -1,0 +1,32 @@
+syntax = "proto3";
+package packet;
+
+option go_package = "packet";
+
+enum Type {
+    // Unknown reserved.
+    Unknown = 0;
+    // Connect client request to connect to Server.
+    Connect = 1;
+    // ConnAck connect Acknowledgment.
+    ConnAck = 2;
+    // Ping client sends a heartbeat to the server.
+    Ping = 3;
+    // Pong server responds to the client heartbeat
+    Pong = 4;
+
+    // Body msg content.
+    Body = 10;
+}
+
+// Packet packet message structure。
+message Packet {
+    // Type packet type。
+    Type type = 1;
+    // UDID Unique identification of device terminal.
+    string UDID = 2;
+    string local_addr = 3;
+    int32 route_id = 4;
+    string request_id = 5;
+    bytes body = 10;
+}
