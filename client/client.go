@@ -240,10 +240,6 @@ func (c *Client) EnableRequestId() {
 	c.enableReqId = true
 }
 
-func (c *Client) Route(id int32, f route.RouteFunc) {
-	route.Put(id, f)
-}
-
 func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }

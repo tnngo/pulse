@@ -291,11 +291,6 @@ func (pl *pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
 }
 
-// Route register message routing.
-func (pl *pulse) Route(id int32, f route.RouteFunc) {
-	route.Put(id, f)
-}
-
 // Encode encapsulate protobuf.
 func Encode(p *packet.Packet) ([]byte, error) {
 	b1, err := proto.Marshal(p)
