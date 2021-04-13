@@ -98,6 +98,9 @@ func (c *Client) connect() ([]byte, error) {
 	if err != nil {
 		log.L().Error(err.Error())
 	}
+	if c.enableReqId {
+		p.RequestId = uuid.New().String()
+	}
 	p.UDID = c.udid
 	p.LocalAddr = la
 	p.Type = packet.Type_Connect
@@ -234,8 +237,8 @@ func (c *Client) writeRoute(id int32, body []byte) error {
 	return nil
 }
 
-// EnableRequestId uuid, 32 length,
-// however, only WriteRoute method will send RequestId.
+// EnableRequestId uuid, 36 length,
+// however, only Dial and WriteRoute method will send RequestId.
 func (c *Client) EnableRequestId() {
 	c.enableReqId = true
 }
