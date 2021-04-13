@@ -20,7 +20,8 @@ import (
 )
 
 type (
-	callConnAckFunc func(context.Context, *packet.Packet)
+	callConnectFunc func() []byte
+	callConnAckFunc func(context.Context, []byte)
 	callCloseFunc   func(context.Context)
 )
 
@@ -35,6 +36,7 @@ type Client struct {
 
 	enableReqId bool
 
+	callConnectFunc callConnectFunc
 	callConnAckFunc callConnAckFunc
 
 	rwmutex sync.RWMutex
@@ -96,10 +98,13 @@ func (c *Client) connect() ([]byte, error) {
 	p := new(packet.Packet)
 	la, err := ip.GetLocalIP()
 	if err != nil {
-		log.L().Error(err.Error())
+		return nil, err
 	}
 	if c.enableReqId {
 		p.RequestId = uuid.New().String()
+	}
+	if c.callConnectFunc != nil {
+		p.Body = c.callConnectFunc()
 	}
 	p.UDID = c.udid
 	p.LocalAddr = la
@@ -151,7 +156,7 @@ func (c *Client) handle(netconn net.Conn) {
 				// connack type is handled separately.
 				if p.Type == packet.Type_ConnAck {
 					if c.callConnAckFunc != nil {
-						c.callConnAckFunc(context.Background(), p)
+						c.callConnAckFunc(context.Background(), p.Body)
 					}
 					c.setConn(netconn)
 					go c.heartbeat()
@@ -241,6 +246,13 @@ func (c *Client) writeRoute(id int32, body []byte) error {
 // however, only Dial and WriteRoute method will send RequestId.
 func (c *Client) EnableRequestId() {
 	c.enableReqId = true
+}
+
+func (c *Client) CallConnect(f callConnectFunc) []byte {
+	if c.callConnectFunc != nil {
+		return c.callConnectFunc()
+	}
+	return nil
 }
 
 func (c *Client) CallConnAck(f callConnAckFunc) {
