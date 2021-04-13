@@ -20,8 +20,9 @@ func close(ctx context.Context) {
 	log.L().Debug("device offline", zap.String("udid", conn.UDID))
 }
 
-func routeTest(ctx context.Context, body []byte) {
+func routeTest(ctx context.Context, body []byte) error {
 	log.L().Debug(string(body))
+	return nil
 }
 
 func main() {
