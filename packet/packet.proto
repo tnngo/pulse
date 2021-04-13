@@ -25,8 +25,8 @@ message Packet {
     Type type = 1;
     // UDID Unique identification of device terminal.
     string UDID = 2;
-    string local_addr = 3;
-    int32 route_id = 4;
-    string request_id = 5;
+    int32 route_id = 3;
+    string request_id = 4;
+    string local_addr = 5;
     bytes body = 10;
 }
