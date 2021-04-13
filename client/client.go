@@ -33,8 +33,6 @@ type Client struct {
 
 	udid string
 
-	route *route.Route
-
 	enableReqId bool
 
 	callConnAckFunc callConnAckFunc
@@ -50,7 +48,6 @@ func New(network string, addr string) *Client {
 	return &Client{
 		network: network,
 		addr:    addr,
-		route:   route.New(),
 	}
 }
 
@@ -193,7 +190,7 @@ func (c *Client) parse(p *packet.Packet) {
 }
 
 func (c *Client) body(p *packet.Packet) {
-	f, err := c.route.Get(p.RouteId)
+	f, err := route.Get(p.RouteId)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
@@ -211,16 +208,6 @@ func (c *Client) setConn(netconn net.Conn) {
 	c.rwmutex.Lock()
 	defer c.rwmutex.Unlock()
 	c.netconn = netconn
-}
-
-// EnableRequestId uuid, 32 length,
-// however, only WriteRoute method will send RequestId.
-func (c *Client) EnableRequestId() {
-	c.enableReqId = true
-}
-
-func (c *Client) Route(id int32, f route.RouteFunc) {
-	c.route.Put(id, f)
 }
 
 func (c *Client) writeRoute(id int32, body []byte) error {
@@ -245,6 +232,16 @@ func (c *Client) writeRoute(id int32, body []byte) error {
 		return err
 	}
 	return nil
+}
+
+// EnableRequestId uuid, 32 length,
+// however, only WriteRoute method will send RequestId.
+func (c *Client) EnableRequestId() {
+	c.enableReqId = true
+}
+
+func (c *Client) Route(id int32, f route.RouteFunc) {
+	route.Put(id, f)
 }
 
 func (c *Client) CallConnAck(f callConnAckFunc) {

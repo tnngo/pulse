@@ -17,36 +17,35 @@ var (
 	ErrRouteNotExist error
 	// ErrRouteType route type is error.
 	ErrRouteType error
+
+	_route *route
 )
 
-type Route struct {
+type route struct {
 	routeMap map[int32]RouteFunc
 }
 
-// New create new route.
-func New() *Route {
-	return &Route{
-		routeMap: make(map[int32]RouteFunc),
-	}
-}
-
-// Put
-func (r *Route) Put(key int32, rf RouteFunc) error {
+func Put(key int32, rf RouteFunc) error {
 	if rf == nil {
 		return ErrRouteNil
 	}
 
-	if _, ok := r.routeMap[key]; ok {
+	if _route == nil {
+		_route = &route{
+			routeMap: make(map[int32]RouteFunc),
+		}
+	}
+
+	if _, ok := _route.routeMap[key]; ok {
 		ErrRouteExist = fmt.Errorf("route already exists. routeid=%d", key)
 		return ErrRouteExist
 	}
-	r.routeMap[key] = rf
+	_route.routeMap[key] = rf
 	return nil
 }
 
-// Get
-func (r *Route) Get(key int32) (RouteFunc, error) {
-	if v, ok := r.routeMap[key]; !ok {
+func Get(key int32) (RouteFunc, error) {
+	if v, ok := _route.routeMap[key]; !ok {
 		ErrRouteNotExist = fmt.Errorf("route not found：%d", key)
 		return nil, ErrRouteExist
 	} else {

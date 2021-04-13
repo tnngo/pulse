@@ -45,8 +45,6 @@ type pulse struct {
 	// packet object pool.
 	packetPool *sync.Pool
 
-	route *route.Route
-
 	callConnectFunc callConnectFunc
 	callCloseFunc   callCloseFunc
 }
@@ -63,7 +61,6 @@ func newPulse(network string, port int) *pulse {
 	pulse := &pulse{
 		network: network,
 		port:    port,
-		route:   route.New(),
 		bufferPool: &sync.Pool{
 			New: func() interface{} {
 				return new(bytes.Buffer)
@@ -278,7 +275,7 @@ func (pl *pulse) pong(netconn net.Conn) {
 }
 
 func (pl *pulse) body(ctx context.Context, p *packet.Packet) {
-	f, err := pl.route.Get(p.RouteId)
+	f, err := route.Get(p.RouteId)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
@@ -296,7 +293,7 @@ func (pl *pulse) CallClose(f callCloseFunc) {
 
 // Route register message routing.
 func (pl *pulse) Route(id int32, f route.RouteFunc) {
-	pl.route.Put(id, f)
+	route.Put(id, f)
 }
 
 // Encode encapsulate protobuf.

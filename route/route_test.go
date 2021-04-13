@@ -13,11 +13,6 @@ func (r *TestRoute) Sign(ctx context.Context, b []byte) {
 }
 
 func Test_route_put(t *testing.T) {
-	r := New()
 	//tr := new(TestRoute)
-	r.Put(1, nil)
-	err := r.Put(1, nil)
-	if err != nil {
-		t.Log(err)
-	}
+	Put(1, nil)
 }
