@@ -5,6 +5,7 @@ import (
 
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse"
+	"github.com/tnngo/pulse/route"
 	"go.uber.org/zap"
 )
 
@@ -19,14 +20,15 @@ func close(ctx context.Context) {
 	log.L().Debug("device offline", zap.String("udid", conn.UDID))
 }
 
-func route(ctx context.Context, body []byte) {
+func routeTest(ctx context.Context, body []byte) {
 	log.L().Debug(string(body))
 }
 
 func main() {
+	route.Put(1, routeTest)
+
 	pl := pulse.New("tcp", 8080)
 	pl.CallConnect(connect)
 	pl.CallClose(close)
-	pl.Route(1, route)
 	pl.Listen()
 }
