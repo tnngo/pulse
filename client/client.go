@@ -106,7 +106,7 @@ func (c *Client) connect() ([]byte, error) {
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
-	p.UDID = c.udid
+	p.Udid = c.udid
 	p.LocalAddr = la
 	p.Type = packet.Type_Connect
 

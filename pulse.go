@@ -149,13 +149,13 @@ func (pl *pulse) handle(netconn net.Conn) {
 				}
 
 				ctxConn := GetCtxConn(ctx)
-				if mapConn := _connCache.Get(ctxConn.UDID); mapConn == nil {
+				if mapConn := _connCache.Get(ctxConn.Udid); mapConn == nil {
 					return
 				} else {
 					if ctxConn.ConnectTime < mapConn.ConnectTime {
 						return
 					}
-					_connCache.Del(ctxConn.UDID)
+					_connCache.Del(ctxConn.Udid)
 				}
 
 				if pl.callCloseFunc != nil {
@@ -191,7 +191,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 					if pl.callConnectFunc != nil {
 						pAck := new(packet.Packet)
 						pAck.Type = packet.Type_ConnAck
-						pAck.UDID = p.UDID
+						pAck.Udid = p.Udid
 
 						repBody := pl.callConnectFunc(ctx, p.Body)
 						if repBody != nil {
@@ -221,12 +221,12 @@ func (pl *pulse) handle(netconn net.Conn) {
 
 func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 	c := conn.New(netconn)
-	if len(p.UDID) == 0 {
-		c.UDID = uuid.New().String()
-		p.UDID = c.UDID
+	if len(p.Udid) == 0 {
+		c.Udid = uuid.New().String()
+		p.Udid = c.Udid
 	} else {
-		if conn := _connCache.Get(p.UDID); conn != nil {
-			_connCache.Del(p.UDID)
+		if conn := _connCache.Get(p.Udid); conn != nil {
+			_connCache.Del(p.Udid)
 			if pl.callCloseFunc != nil {
 				oldctx := pl.setCtxConn(context.Background(), conn)
 				pl.callCloseFunc(oldctx)
@@ -234,13 +234,13 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 			conn.GetNetConn().Close()
 			time.Sleep(5 * time.Second)
 		}
-		c.UDID = p.UDID
+		c.Udid = p.Udid
 	}
 	c.Network = netconn.RemoteAddr().Network()
 	c.LocalAddr = p.LocalAddr
 	c.RemoteAddr = netconn.RemoteAddr().String()
 	c.ConnectTime = time.Now().UnixNano() / 1e6
-	_connCache.Put(c.UDID, c)
+	_connCache.Put(c.Udid, c)
 	ctx := pl.setCtxConn(context.Background(), c)
 	return ctx
 }

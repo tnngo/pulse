@@ -9,7 +9,7 @@ type Conn struct {
 	netconn net.Conn
 
 	// client unique identifier.
-	UDID    string
+	Udid    string
 	Network string
 	// client remote address.
 	RemoteAddr string
