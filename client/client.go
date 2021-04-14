@@ -244,8 +244,8 @@ func (c *Client) UDID(udid string) {
 }
 
 func (c *Client) Secret(key, value string) {
-	hsha1 := hmac.New(sha1.New, []byte(key))
-	hsha1.Write([]byte(value))
+	hsha1 := hmac.New(sha1.New, []byte(key+"."+value))
+	hsha1.Write([]byte(key + "." + value + "." + c.udid))
 	result := hsha1.Sum(nil)
 	hex16 := hex.EncodeToString(result)
 	c.secret = hex16
