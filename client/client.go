@@ -103,7 +103,7 @@ func (c *Client) connect() ([]byte, error) {
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
-	if c.authMode == packet.AuthMode_Default && c.authMode == packet.AuthMode_CustomizeSecret {
+	if c.authMode == packet.AuthMode_Default && c.authMode == packet.AuthMode_CustomSecret {
 		p.Secret = c.secret
 	}
 

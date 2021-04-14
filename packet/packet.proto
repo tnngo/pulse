@@ -23,8 +23,8 @@ enum Type {
 enum AuthMode {
     Not = 0;
     Default = 1;
-    CustomizeSecret = 2;
-    CustomizeAuthBody = 3;
+    CustomSecret = 2;
+    FullyCustom = 3;
 }
 
 // Packet packet message structure。
