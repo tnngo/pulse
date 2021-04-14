@@ -107,7 +107,7 @@ func (pl *pulse) listen() error {
 	}
 	localAddr := fmt.Sprintf("%s:%d", ipAddr, pl.port)
 
-	log.L().Info("Service started successfully", zap.String("listen", localAddr), zap.String("network", pl.network))
+	log.L().Info("server started successfully", zap.String("listen", localAddr), zap.String("network", pl.network))
 
 	pl.accept(ln)
 	return nil
