@@ -16,7 +16,7 @@ enum Type {
     Pong = 4;
 
     // Body msg content.
-    Body = 10;
+    Body = 99;
 }
 
 // Packet packet message structure。
@@ -32,5 +32,5 @@ message Packet {
     int32 route_id = 4;
     string request_id = 5;
     string local_addr = 6;
-    bytes body = 10;
+    bytes body = 99;
 }
