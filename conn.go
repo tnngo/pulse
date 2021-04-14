@@ -12,14 +12,14 @@ type Conn struct {
 	netconn net.Conn
 
 	// client unique identifier.
-	Udid    string
-	Network string
+	udid    string
+	network string
 	// client remote address.
-	RemoteAddr string
+	remoteAddr string
 	// client local address.
-	LocalAddr string
+	localAddr string
 	// client connection time.
-	ConnectTime int64
+	connectTime int64
 }
 
 func newConn(netconn net.Conn) *Conn {
@@ -30,10 +30,10 @@ func newConn(netconn net.Conn) *Conn {
 
 func (c *Conn) writeRoute(id int32, body []byte) error {
 	p := new(packet.Packet)
-	p.Udid = c.Udid
+	p.Udid = c.udid
 	p.Type = packet.Type_Body
 	p.RouteId = id
-	p.LocalAddr = c.LocalAddr
+	p.LocalAddr = c.localAddr
 	p.Body = body
 
 	b, err := proto.Marshal(p)
@@ -47,6 +47,26 @@ func (c *Conn) writeRoute(id int32, body []byte) error {
 	}
 
 	return nil
+}
+
+func (c *Conn) UDID() string {
+	return c.udid
+}
+
+func (c *Conn) Network() string {
+	return c.network
+}
+
+func (c *Conn) RemoteAddr() string {
+	return c.remoteAddr
+}
+
+func (c *Conn) LocalAddr() string {
+	return c.localAddr
+}
+
+func (c *Conn) ConnectTime() int64 {
+	return c.connectTime
 }
 
 func (c *Conn) WriteRoute(id int32, body []byte) error {

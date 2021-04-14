@@ -144,13 +144,13 @@ func (pl *pulse) handle(netconn net.Conn) {
 				}
 
 				ctxConn := GetCtxConn(ctx)
-				if mapConn := _connCache.Get(ctxConn.Udid); mapConn == nil {
+				if mapConn := _connCache.Get(ctxConn.udid); mapConn == nil {
 					return
 				} else {
-					if ctxConn.ConnectTime < mapConn.ConnectTime {
+					if ctxConn.connectTime < mapConn.connectTime {
 						return
 					}
-					_connCache.Del(ctxConn.Udid)
+					_connCache.Del(ctxConn.udid)
 				}
 
 				if pl.callCloseFunc != nil {
@@ -223,8 +223,8 @@ func (pl *pulse) handle(netconn net.Conn) {
 func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 	c := newConn(netconn)
 	if len(p.Udid) == 0 {
-		c.Udid = uuid.New().String()
-		p.Udid = c.Udid
+		c.udid = uuid.New().String()
+		p.Udid = c.udid
 	} else {
 		if conn := _connCache.Get(p.Udid); conn != nil {
 			_connCache.Del(p.Udid)
@@ -233,13 +233,13 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 			// 	pl.callCloseFunc(oldctx)
 			// }
 		}
-		c.Udid = p.Udid
+		c.udid = p.Udid
 	}
-	c.Network = netconn.RemoteAddr().Network()
-	c.LocalAddr = p.LocalAddr
-	c.RemoteAddr = netconn.RemoteAddr().String()
-	c.ConnectTime = time.Now().UnixNano() / 1e6
-	_connCache.Put(c.Udid, c)
+	c.network = netconn.RemoteAddr().Network()
+	c.localAddr = p.LocalAddr
+	c.remoteAddr = netconn.RemoteAddr().String()
+	c.connectTime = time.Now().UnixNano() / 1e6
+	_connCache.Put(c.udid, c)
 	ctx := pl.setCtxConn(context.Background(), c)
 	return ctx
 }
