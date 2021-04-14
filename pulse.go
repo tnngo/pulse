@@ -22,6 +22,7 @@ import (
 const (
 	CTX_CONN   = "conn"
 	CTX_REQ_ID = "request_id"
+	CTX_SECRET = "secret"
 )
 
 type (
@@ -143,7 +144,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 					return
 				}
 
-				ctxConn := GetCtxConn(ctx)
+				ctxConn := CtxConn(ctx)
 				if mapConn := _connCache.Get(ctxConn.udid); mapConn == nil {
 					return
 				} else {
@@ -192,6 +193,10 @@ func (pl *pulse) handle(netconn net.Conn) {
 							ctx = context.WithValue(ctx, CTX_REQ_ID, uuid.New().String())
 						} else {
 							ctx = context.WithValue(ctx, CTX_REQ_ID, p.RequestId)
+						}
+
+						if p.AuthMode != packet.AuthMode_FullyCustom {
+							ctx = context.WithValue(ctx, CTX_SECRET, p.Secret)
 						}
 
 						repBody := pl.callConnectFunc(ctx, p.Body)
@@ -304,12 +309,16 @@ func Encode(p *packet.Packet) ([]byte, error) {
 	return b3, nil
 }
 
-func GetCtxConn(ctx context.Context) *Conn {
+func CtxConn(ctx context.Context) *Conn {
 	return ctx.Value(CTX_CONN).(*Conn)
 }
 
-func GetCtxRequestId(ctx context.Context) string {
+func CtxRequestId(ctx context.Context) string {
 	return ctx.Value(CTX_REQ_ID).(string)
+}
+
+func CtxSecret(ctx context.Context) string {
+	return ctx.Value(CTX_SECRET).(string)
 }
 
 func GetConn(udid string) *Conn {
