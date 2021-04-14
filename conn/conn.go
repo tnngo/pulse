@@ -52,7 +52,3 @@ func (c *Conn) writeRoute(id int32, body []byte) error {
 func (c *Conn) WriteRoute(id int32, body []byte) error {
 	return c.writeRoute(id, body)
 }
-
-func (c *Conn) GetNetConn() net.Conn {
-	return c.netconn
-}
