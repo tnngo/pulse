@@ -9,12 +9,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"net"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/google/uuid"
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse"
 	"github.com/tnngo/pulse/ip"
@@ -38,8 +36,6 @@ type Client struct {
 	udid     string
 	secret   string
 	authMode packet.AuthMode
-
-	enableReqId bool
 
 	callConnectFunc callConnectFunc
 	callConnAckFunc callConnAckFunc
@@ -219,16 +215,14 @@ func (c *Client) setConn(netconn net.Conn) {
 	c.netconn = netconn
 }
 
-func (c *Client) writeRoute(id int32, body []byte) error {
+func (c *Client) writeRoute(id int32, reqId string, body []byte) error {
 	if c.getConn() == nil {
 		return errors.New("No connection available, the connection object is nil")
 	}
 
 	p := new(packet.Packet)
 	p.LocalAddr = c.getConn().LocalAddr().String()
-	if c.enableReqId {
-		p.RequestId = strings.Replace(uuid.New().String(), "-", "", -1)
-	}
+	p.RequestId = reqId
 	p.RouteId = id
 	p.Type = packet.Type_Body
 	p.Body = body
@@ -266,12 +260,6 @@ func (c *Client) EnableCustomSecret(secret string) {
 	c.secret = secret
 }
 
-// EnableRequestId uuid, 36 length,
-// however, only Dial and WriteRoute method will send RequestId.
-func (c *Client) EnableRequestId() {
-	c.enableReqId = true
-}
-
 func (c *Client) CallConnect(f callConnectFunc) []byte {
 	if c.callConnectFunc != nil {
 		return c.callConnectFunc()
@@ -283,7 +271,10 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }
 
-//
 func (c *Client) WriteRoute(id int32, body []byte) error {
-	return c.writeRoute(id, body)
+	return c.writeRoute(id, "", body)
+}
+
+func (c *Client) WriteRouteReqId(id int32, reqId string, body []byte) error {
+	return c.writeRoute(id, reqId, body)
 }

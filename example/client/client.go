@@ -16,7 +16,6 @@ func main() {
 	log.NewSimple()
 	c := client.New("tcp", ":8080")
 	c.UDID("123")
-	c.EnableRequestId()
 	c.CallConnAck(connAck)
 	go c.Dial()
 	time.Sleep(1 * time.Second)
