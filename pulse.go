@@ -193,6 +193,12 @@ func (pl *pulse) handle(netconn net.Conn) {
 						pAck.Type = packet.Type_ConnAck
 						pAck.Udid = p.Udid
 
+						if len(p.RequestId) == 0 {
+							ctx = context.WithValue(ctx, CTX_REQ_ID, uuid.New().String())
+						} else {
+							ctx = context.WithValue(ctx, CTX_REQ_ID, p.RequestId)
+						}
+
 						repBody := pl.callConnectFunc(ctx, p.Body)
 						if repBody != nil {
 							// type connack,
