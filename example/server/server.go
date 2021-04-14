@@ -11,13 +11,13 @@ import (
 
 func connect(ctx context.Context, body []byte) []byte {
 	conn := pulse.GetCtxConn(ctx)
-	log.L().Debug("device online", zap.String("udid", conn.Udid))
+	log.L().Debug("device online", zap.String("udid", conn.UDID()))
 	return nil
 }
 
 func close(ctx context.Context) {
 	conn := pulse.GetCtxConn(ctx)
-	log.L().Debug("device offline", zap.String("udid", conn.Udid))
+	log.L().Debug("device offline", zap.String("udid", conn.UDID()))
 }
 
 func routeTest(ctx context.Context, body []byte) error {
