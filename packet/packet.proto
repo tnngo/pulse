@@ -21,9 +21,10 @@ enum Type {
 
 // AuthMode Type = Connect
 enum AuthMode {
-    Default = 0;
-    CustomizeSecret = 1;
-    CustomizeAuthBody = 2;
+    Not = 0;
+    Default = 1;
+    CustomizeSecret = 2;
+    CustomizeAuthBody = 3;
 }
 
 // Packet packet message structure。

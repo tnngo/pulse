@@ -103,6 +103,9 @@ func (c *Client) connect() ([]byte, error) {
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
+	if c.authMode == packet.AuthMode_Default && c.authMode == packet.AuthMode_CustomizeSecret {
+		p.Secret = c.secret
+	}
 
 	p.Udid = c.udid
 	p.LocalAddr = la
