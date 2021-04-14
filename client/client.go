@@ -256,9 +256,13 @@ func (c *Client) Secret(key, value string) {
 	c.secret = hex16
 }
 
-// EnableCustomizeSecret this method cannot be used with Secret at the same time.
-func (c *Client) EnableCustomizeSecret(secret string) {
-	c.authMode = packet.AuthMode_CustomizeSecret
+func (c *Client) EnalbeFullyCustom() {
+	c.authMode = packet.AuthMode_FullyCustom
+}
+
+// EnableCustomSecret this method cannot be used with Secret at the same time.
+func (c *Client) EnableCustomSecret(secret string) {
+	c.authMode = packet.AuthMode_CustomSecret
 	c.secret = secret
 }
 
