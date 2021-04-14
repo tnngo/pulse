@@ -26,7 +26,7 @@ const (
 )
 
 type (
-	callConnectFunc func(context.Context, []byte) []byte
+	callConnectFunc func(context.Context, []byte) ([]byte, error)
 	callCloseFunc   func(context.Context)
 )
 
@@ -199,7 +199,11 @@ func (pl *pulse) handle(netconn net.Conn) {
 							ctx = context.WithValue(ctx, CTX_SECRET, p.Secret)
 						}
 
-						repBody := pl.callConnectFunc(ctx, p.Body)
+						repBody, err := pl.callConnectFunc(ctx, p.Body)
+						if err != nil {
+							netconn.Close()
+							return
+						}
 						if repBody != nil {
 							// type connack,
 							// connack type is handled separately.

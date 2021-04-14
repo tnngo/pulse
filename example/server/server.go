@@ -9,10 +9,10 @@ import (
 	"go.uber.org/zap"
 )
 
-func connect(ctx context.Context, body []byte) []byte {
+func connect(ctx context.Context, body []byte) ([]byte, error) {
 	conn := pulse.CtxConn(ctx)
 	log.L().Debug("device online", zap.String("udid", conn.UDID()))
-	return nil
+	return nil, nil
 }
 
 func close(ctx context.Context) {
