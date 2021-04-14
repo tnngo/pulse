@@ -1,4 +1,4 @@
-package conn
+package pulse
 
 import (
 	"net"
@@ -22,7 +22,7 @@ type Conn struct {
 	ConnectTime int64
 }
 
-func NewConn(netconn net.Conn) *Conn {
+func newConn(netconn net.Conn) *Conn {
 	return &Conn{
 		netconn: netconn,
 	}

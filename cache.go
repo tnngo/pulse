@@ -1,27 +1,25 @@
-package conn
+package pulse
 
 import (
 	"sync"
 )
 
-type Cache struct {
+type cache struct {
 	connMap map[string]*Conn
 	rwmutex sync.RWMutex
 }
 
-func NewCache() *Cache {
-	return &Cache{
-		connMap: make(map[string]*Conn),
-	}
-}
+var (
+	_connCache = &cache{connMap: make(map[string]*Conn)}
+)
 
-func (cp *Cache) Put(udid string, c *Conn) {
+func (cp *cache) Put(udid string, c *Conn) {
 	cp.rwmutex.Lock()
 	defer cp.rwmutex.Unlock()
 	cp.connMap[udid] = c
 }
 
-func (cp *Cache) Del(udid string) {
+func (cp *cache) Del(udid string) {
 	cp.rwmutex.Lock()
 	defer cp.rwmutex.Unlock()
 	if c, ok := cp.connMap[udid]; ok {
@@ -30,13 +28,13 @@ func (cp *Cache) Del(udid string) {
 	delete(cp.connMap, udid)
 }
 
-func (cp *Cache) Get(udid string) *Conn {
+func (cp *cache) Get(udid string) *Conn {
 	cp.rwmutex.RLock()
 	defer cp.rwmutex.RUnlock()
 	return cp.connMap[udid]
 }
 
-func (cp *Cache) List() []*Conn {
+func (cp *cache) List() []*Conn {
 	cp.rwmutex.RLock()
 	defer cp.rwmutex.RUnlock()
 	conns := make([]*Conn, 0)

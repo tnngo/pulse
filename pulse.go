@@ -13,7 +13,6 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/tnngo/log"
-	"github.com/tnngo/pulse/conn"
 	"github.com/tnngo/pulse/ip"
 	"github.com/tnngo/pulse/packet"
 	"github.com/tnngo/pulse/route"
@@ -28,10 +27,6 @@ const (
 type (
 	callConnectFunc func(context.Context, []byte) []byte
 	callCloseFunc   func(context.Context)
-)
-
-var (
-	_connCache = conn.NewCache()
 )
 
 type pulse struct {
@@ -226,7 +221,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 }
 
 func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
-	c := conn.NewConn(netconn)
+	c := newConn(netconn)
 	if len(p.Udid) == 0 {
 		c.Udid = uuid.New().String()
 		p.Udid = c.Udid
@@ -250,7 +245,7 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 }
 
 // set connection's context.
-func (pl *pulse) setCtxConn(ctx context.Context, c *conn.Conn) context.Context {
+func (pl *pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
 	return context.WithValue(ctx, CTX_CONN, c)
 }
 
@@ -309,14 +304,14 @@ func Encode(p *packet.Packet) ([]byte, error) {
 	return b3, nil
 }
 
-func GetCtxConn(ctx context.Context) *conn.Conn {
-	return ctx.Value(CTX_CONN).(*conn.Conn)
+func GetCtxConn(ctx context.Context) *Conn {
+	return ctx.Value(CTX_CONN).(*Conn)
 }
 
 func GetCtxRequestId(ctx context.Context) string {
 	return ctx.Value(CTX_REQ_ID).(string)
 }
 
-func GetConn(udid string) *conn.Conn {
+func GetConn(udid string) *Conn {
 	return _connCache.Get(udid)
 }
