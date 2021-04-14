@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"net"
 	"strings"
@@ -32,7 +35,8 @@ type Client struct {
 
 	netconn net.Conn
 
-	udid string
+	udid   string
+	secret string
 
 	enableReqId bool
 
@@ -51,11 +55,6 @@ func New(network string, addr string) *Client {
 		network: network,
 		addr:    addr,
 	}
-}
-
-// UDID set the unique identifier of the client.
-func (c *Client) UDID(udid string) {
-	c.udid = udid
 }
 
 func (c *Client) Dial() {
@@ -237,6 +236,19 @@ func (c *Client) writeRoute(id int32, body []byte) error {
 		return err
 	}
 	return nil
+}
+
+// UDID set the unique identifier of the client.
+func (c *Client) UDID(udid string) {
+	c.udid = udid
+}
+
+func (c *Client) Secret(key, value string) {
+	hsha1 := hmac.New(sha1.New, []byte(key))
+	hsha1.Write([]byte(value))
+	result := hsha1.Sum(nil)
+	hex16 := hex.EncodeToString(result)
+	c.secret = hex16
 }
 
 // EnableRequestId uuid, 36 length,
