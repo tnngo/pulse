@@ -75,8 +75,9 @@ func newPulse(network string, port int) *pulse {
 	return pulse
 }
 
-func (pl *pulse) ReadTimeOut(t time.Duration) {
+func (pl *pulse) ReadTimeOut(t time.Duration) *pulse {
 	pl.readTimeOut = t
+	return pl
 }
 
 func (pl *pulse) Listen() error {
