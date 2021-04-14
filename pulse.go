@@ -312,3 +312,7 @@ func GetCtxConn(ctx context.Context) *conn.Conn {
 func GetCtxRequestId(ctx context.Context) string {
 	return ctx.Value(CTX_REQ_ID).(string)
 }
+
+func GetConn(udid string) *conn.Conn {
+	return _connCache.Get(udid)
+}
