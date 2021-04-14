@@ -19,18 +19,26 @@ enum Type {
     Body = 99;
 }
 
+// AuthMode Type = Connect
+enum AuthMode {
+    Default = 0;
+    CustomizeSecret = 1;
+    CustomizeAuthBody = 2;
+}
+
 // Packet packet message structure。
 message Packet {
     // Type packet type。
     Type type = 1;
     // udid Unique identification of device terminal.
     string udid = 2;
+    AuthMode auth_mode = 3;
     // just a simple security authorization field,
     // if you want to implement it yourself, 
     // you can give up this field, and encapsulate it in the Body when the type is Connect.
-    string secret = 3;
-    int32 route_id = 4;
-    string request_id = 5;
-    string local_addr = 6;
+    string secret = 4;
+    int32 route_id = 5;
+    string request_id = 6;
+    string local_addr = 7;
     bytes body = 99;
 }

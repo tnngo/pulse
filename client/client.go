@@ -35,11 +35,11 @@ type Client struct {
 
 	netconn net.Conn
 
-	udid   string
-	secret string
+	udid     string
+	secret   string
+	authMode packet.AuthMode
 
-	enableReqId      bool
-	enableSimpleAuth bool
+	enableReqId bool
 
 	callConnectFunc callConnectFunc
 	callConnAckFunc callConnAckFunc
@@ -103,6 +103,7 @@ func (c *Client) connect() ([]byte, error) {
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
+
 	p.Udid = c.udid
 	p.LocalAddr = la
 	p.Type = packet.Type_Connect
@@ -244,7 +245,6 @@ func (c *Client) UDID(udid string) {
 	c.udid = udid
 }
 
-// Secret need to call the EnableSimpleSecret method before using this method.
 func (c *Client) Secret(key, value string) {
 	hsha1 := hmac.New(sha1.New, []byte(key+"."+value))
 	hsha1.Write([]byte(key + "." + value + "." + c.udid))
@@ -253,9 +253,10 @@ func (c *Client) Secret(key, value string) {
 	c.secret = hex16
 }
 
-// EnableSimpleSecret hmac-sha1.
-func (c *Client) EnableSimpleSecret() {
-	c.enableSimpleAuth = true
+// EnableCustomizeSecret this method cannot be used with Secret at the same time.
+func (c *Client) EnableCustomizeSecret(secret string) {
+	c.authMode = packet.AuthMode_CustomizeSecret
+	c.secret = secret
 }
 
 // EnableRequestId uuid, 36 length,
