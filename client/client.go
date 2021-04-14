@@ -100,9 +100,6 @@ func (c *Client) connect() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if c.enableReqId {
-		p.RequestId = uuid.New().String()
-	}
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
