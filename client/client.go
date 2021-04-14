@@ -38,7 +38,8 @@ type Client struct {
 	udid   string
 	secret string
 
-	enableReqId bool
+	enableReqId      bool
+	enableSimpleAuth bool
 
 	callConnectFunc callConnectFunc
 	callConnAckFunc callConnAckFunc
@@ -243,12 +244,18 @@ func (c *Client) UDID(udid string) {
 	c.udid = udid
 }
 
+// Secret need to call the EnableSimpleSecret method before using this method.
 func (c *Client) Secret(key, value string) {
 	hsha1 := hmac.New(sha1.New, []byte(key+"."+value))
 	hsha1.Write([]byte(key + "." + value + "." + c.udid))
 	result := hsha1.Sum(nil)
 	hex16 := hex.EncodeToString(result)
 	c.secret = hex16
+}
+
+// EnableSimpleSecret hmac-sha1.
+func (c *Client) EnableSimpleSecret() {
+	c.enableSimpleAuth = true
 }
 
 // EnableRequestId uuid, 36 length,
