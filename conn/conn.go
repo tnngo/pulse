@@ -22,7 +22,7 @@ type Conn struct {
 	ConnectTime int64
 }
 
-func New(netconn net.Conn) *Conn {
+func NewConn(netconn net.Conn) *Conn {
 	return &Conn{
 		netconn: netconn,
 	}

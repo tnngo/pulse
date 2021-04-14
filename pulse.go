@@ -13,7 +13,6 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/tnngo/log"
-	"github.com/tnngo/pulse/cache"
 	"github.com/tnngo/pulse/conn"
 	"github.com/tnngo/pulse/ip"
 	"github.com/tnngo/pulse/packet"
@@ -32,7 +31,7 @@ type (
 )
 
 var (
-	_connCache = cache.New()
+	_connCache = conn.NewCache()
 )
 
 type pulse struct {
@@ -221,19 +220,17 @@ func (pl *pulse) handle(netconn net.Conn) {
 }
 
 func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
-	c := conn.New(netconn)
+	c := conn.NewConn(netconn)
 	if len(p.Udid) == 0 {
 		c.Udid = uuid.New().String()
 		p.Udid = c.Udid
 	} else {
 		if conn := _connCache.Get(p.Udid); conn != nil {
 			_connCache.Del(p.Udid)
-			if pl.callCloseFunc != nil {
-				oldctx := pl.setCtxConn(context.Background(), conn)
-				pl.callCloseFunc(oldctx)
-			}
-			conn.GetNetConn().Close()
-			time.Sleep(5 * time.Second)
+			// if pl.callCloseFunc != nil {
+			// 	oldctx := pl.setCtxConn(context.Background(), conn)
+			// 	pl.callCloseFunc(oldctx)
+			// }
 		}
 		c.Udid = p.Udid
 	}
