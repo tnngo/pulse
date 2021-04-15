@@ -253,11 +253,8 @@ func (c *Client) EnableCustomSecret(secret string) {
 	c.secret = secret
 }
 
-func (c *Client) CallConnect(f callConnectFunc) []byte {
-	if c.callConnectFunc != nil {
-		return c.callConnectFunc()
-	}
-	return nil
+func (c *Client) CallConnect(f callConnectFunc) {
+	c.callConnectFunc = f
 }
 
 func (c *Client) CallConnAck(f callConnAckFunc) {
