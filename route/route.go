@@ -7,7 +7,7 @@ import (
 )
 
 // RouteFunc route function type.
-type RouteFunc func(context.Context, []byte) ([]byte, error)
+type RouteFunc func(context.Context, []byte) error
 
 var (
 	ErrRouteNil = errors.New("Route type value cannot be nil")
