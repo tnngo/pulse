@@ -338,6 +338,6 @@ func CtxUDID(ctx context.Context) string {
 	return ctx.Value(ctx_udid).(string)
 }
 
-func GetConn(udid string) *Conn {
+func Connection(udid string) *Conn {
 	return _connCache.Get(udid)
 }

@@ -152,6 +152,7 @@ func (c *Client) handle(netconn net.Conn) {
 				// type connack,
 				// connack type is handled separately.
 				if p.Type == packet.Type_ConnAck {
+					log.L().Info("successfully connected to the server")
 					if c.callConnAckFunc != nil {
 						c.callConnAckFunc(context.Background(), p.Body)
 					}
