@@ -20,9 +20,10 @@ import (
 )
 
 const (
-	CTX_CONN   = "conn"
-	CTX_REQ_ID = "request_id"
-	CTX_SECRET = "secret"
+	ctx_conn   = "conn"
+	ctx_req_id = "request_id"
+	ctx_secret = "secret"
+	ctx_udid   = "udid"
 )
 
 type (
@@ -190,13 +191,13 @@ func (pl *pulse) handle(netconn net.Conn) {
 						pAck.Udid = p.Udid
 
 						if len(p.RequestId) == 0 {
-							ctx = context.WithValue(ctx, CTX_REQ_ID, uuid.New().String())
+							ctx = pl.setCtxReqId(ctx, uuid.New().String())
 						} else {
-							ctx = context.WithValue(ctx, CTX_REQ_ID, p.RequestId)
+							ctx = pl.setCtxReqId(ctx, p.RequestId)
 						}
 
 						if p.AuthMode != packet.AuthMode_FullyCustom {
-							ctx = context.WithValue(ctx, CTX_SECRET, p.Secret)
+							ctx = pl.setSecret(ctx, p.Secret)
 						}
 
 						repBody, err := pl.callConnectFunc(ctx, p.Body)
@@ -255,11 +256,19 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 
 // set connection's context.
 func (pl *pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
-	return context.WithValue(ctx, CTX_CONN, c)
+	return context.WithValue(ctx, ctx_conn, c)
 }
 
 func (pl *pulse) setCtxReqId(ctx context.Context, reqId string) context.Context {
-	return context.WithValue(ctx, CTX_REQ_ID, reqId)
+	return context.WithValue(ctx, ctx_req_id, reqId)
+}
+
+func (pl *pulse) setCtxUDID(ctx context.Context, udid string) context.Context {
+	return context.WithValue(ctx, ctx_udid, udid)
+}
+
+func (pl *pulse) setSecret(ctx context.Context, secret string) context.Context {
+	return context.WithValue(ctx, ctx_secret, secret)
 }
 
 func (pl *pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
@@ -314,15 +323,19 @@ func Encode(p *packet.Packet) ([]byte, error) {
 }
 
 func CtxConn(ctx context.Context) *Conn {
-	return ctx.Value(CTX_CONN).(*Conn)
+	return ctx.Value(ctx_conn).(*Conn)
 }
 
 func CtxRequestId(ctx context.Context) string {
-	return ctx.Value(CTX_REQ_ID).(string)
+	return ctx.Value(ctx_req_id).(string)
 }
 
 func CtxSecret(ctx context.Context) string {
-	return ctx.Value(CTX_SECRET).(string)
+	return ctx.Value(ctx_secret).(string)
+}
+
+func CtxUDID(ctx context.Context) string {
+	return ctx.Value(ctx_udid).(string)
 }
 
 func GetConn(udid string) *Conn {
