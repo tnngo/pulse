@@ -185,10 +185,6 @@ func (pl *pulse) handle(netconn net.Conn) {
 					// connect type is handled separately.
 					ctx = pl.connect(netconn, p)
 
-					pAck := new(packet.Packet)
-					pAck.Type = packet.Type_ConnAck
-					pAck.Udid = p.Udid
-
 					if len(p.RequestId) == 0 {
 						ctx = pl.setCtxReqId(ctx, uuid.New().String())
 					} else {
@@ -199,6 +195,9 @@ func (pl *pulse) handle(netconn net.Conn) {
 						ctx = pl.setSecret(ctx, p.Secret)
 					}
 
+					pAck := new(packet.Packet)
+					pAck.Type = packet.Type_ConnAck
+					pAck.Udid = p.Udid
 					if pl.callConnectFunc != nil {
 						repBody, err := pl.callConnectFunc(ctx, p.Body)
 						if err != nil {
