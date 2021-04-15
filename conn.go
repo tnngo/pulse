@@ -33,7 +33,6 @@ func (c *Conn) writeRoute(id int32, body []byte) error {
 	p.Udid = c.udid
 	p.Type = packet.Type_Body
 	p.RouteId = id
-	p.LocalAddr = c.localAddr
 	p.Body = body
 
 	b, err := proto.Marshal(p)
@@ -59,10 +58,6 @@ func (c *Conn) Network() string {
 
 func (c *Conn) RemoteAddr() string {
 	return c.remoteAddr
-}
-
-func (c *Conn) LocalAddr() string {
-	return c.localAddr
 }
 
 func (c *Conn) ConnectTime() int64 {

@@ -39,6 +39,5 @@ message Packet {
     string secret = 4;
     int32 route_id = 5;
     string request_id = 6;
-    string local_addr = 7;
     bytes body = 99;
 }

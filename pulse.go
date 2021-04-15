@@ -253,7 +253,6 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 		c.udid = p.Udid
 	}
 	c.network = netconn.RemoteAddr().Network()
-	c.localAddr = p.LocalAddr
 	c.remoteAddr = netconn.RemoteAddr().String()
 	c.connectTime = time.Now().UnixNano() / 1e6
 	_connCache.Put(c.udid, c)

@@ -15,7 +15,6 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse"
-	"github.com/tnngo/pulse/ip"
 	"github.com/tnngo/pulse/packet"
 	"github.com/tnngo/pulse/route"
 )
@@ -92,10 +91,6 @@ func (c *Client) dial() {
 
 func (c *Client) connect() ([]byte, error) {
 	p := new(packet.Packet)
-	la, err := ip.GetLocalIP()
-	if err != nil {
-		return nil, err
-	}
 	if c.callConnectFunc != nil {
 		p.Body = c.callConnectFunc()
 	}
@@ -104,7 +99,6 @@ func (c *Client) connect() ([]byte, error) {
 	}
 
 	p.Udid = c.udid
-	p.LocalAddr = la
 	p.Type = packet.Type_Connect
 
 	return pulse.Encode(p)
@@ -221,7 +215,6 @@ func (c *Client) writeRoute(id int32, reqId string, body []byte) error {
 	}
 
 	p := new(packet.Packet)
-	p.LocalAddr = c.getConn().LocalAddr().String()
 	p.RequestId = reqId
 	p.RouteId = id
 	p.Type = packet.Type_Body
