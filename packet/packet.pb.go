@@ -99,16 +99,16 @@ type Packet struct {
 	// Type packet type。
 	Type Type `protobuf:"varint,1,opt,name=type,proto3,enum=packet.Type" json:"type,omitempty"`
 	// udid Unique identification of device terminal.
-	Udid     string   `protobuf:"bytes,2,opt,name=udid,proto3" json:"udid,omitempty"`
-	AuthMode AuthMode `protobuf:"varint,3,opt,name=auth_mode,json=authMode,proto3,enum=packet.AuthMode" json:"auth_mode,omitempty"`
+	Udid string `protobuf:"bytes,2,opt,name=udid,proto3" json:"udid,omitempty"`
 	// just a simple security authorization field,
 	// if you want to implement it yourself,
 	// you can give up this field, and encapsulate it in the Body when the type is Connect.
-	Secret    string `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
-	RouteId   int32  `protobuf:"varint,5,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
-	RequestId string `protobuf:"bytes,6,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	LocalAddr string `protobuf:"bytes,7,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
-	Body      []byte `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
+	AuthMode  AuthMode `protobuf:"varint,3,opt,name=auth_mode,json=authMode,proto3,enum=packet.AuthMode" json:"auth_mode,omitempty"`
+	Secret    string   `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
+	RouteId   int32    `protobuf:"varint,5,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
+	RequestId string   `protobuf:"bytes,6,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	LocalAddr string   `protobuf:"bytes,7,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
+	Body      []byte   `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (m *Packet) Reset()         { *m = Packet{} }
