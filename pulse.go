@@ -23,7 +23,6 @@ const (
 	ctx_conn   = "conn"
 	ctx_req_id = "request_id"
 	ctx_secret = "secret"
-	ctx_udid   = "udid"
 )
 
 type (
@@ -190,8 +189,6 @@ func (pl *pulse) handle(netconn net.Conn) {
 					pAck.Type = packet.Type_ConnAck
 					pAck.Udid = p.Udid
 
-					ctx = pl.setCtxUDID(ctx, p.Udid)
-
 					if len(p.RequestId) == 0 {
 						ctx = pl.setCtxReqId(ctx, uuid.New().String())
 					} else {
@@ -269,10 +266,6 @@ func (pl *pulse) setCtxReqId(ctx context.Context, reqId string) context.Context 
 	return context.WithValue(ctx, ctx_req_id, reqId)
 }
 
-func (pl *pulse) setCtxUDID(ctx context.Context, udid string) context.Context {
-	return context.WithValue(ctx, ctx_udid, udid)
-}
-
 func (pl *pulse) setSecret(ctx context.Context, secret string) context.Context {
 	return context.WithValue(ctx, ctx_secret, secret)
 }
@@ -346,14 +339,6 @@ func CtxRequestId(ctx context.Context) string {
 
 func CtxSecret(ctx context.Context) string {
 	if c := ctx.Value(ctx_secret); c == nil {
-		return ""
-	} else {
-		return c.(string)
-	}
-}
-
-func CtxUDID(ctx context.Context) string {
-	if c := ctx.Value(ctx_udid); c == nil {
 		return ""
 	} else {
 		return c.(string)
