@@ -329,21 +329,37 @@ func Encode(p *packet.Packet) ([]byte, error) {
 }
 
 func CtxConn(ctx context.Context) *Conn {
-	return ctx.Value(ctx_conn).(*Conn)
+	if c := ctx.Value(ctx_conn); c == nil {
+		return nil
+	} else {
+		return c.(*Conn)
+	}
 }
 
 func CtxRequestId(ctx context.Context) string {
-	return ctx.Value(ctx_req_id).(string)
+	if c := ctx.Value(ctx_req_id); c == nil {
+		return ""
+	} else {
+		return c.(string)
+	}
 }
 
 func CtxSecret(ctx context.Context) string {
-	return ctx.Value(ctx_secret).(string)
+	if c := ctx.Value(ctx_secret); c == nil {
+		return ""
+	} else {
+		return c.(string)
+	}
 }
 
 func CtxUDID(ctx context.Context) string {
-	return ctx.Value(ctx_udid).(string)
+	if c := ctx.Value(ctx_udid); c == nil {
+		return ""
+	} else {
+		return c.(string)
+	}
 }
 
-func Connection(udid string) *Conn {
+func CacheConn(udid string) *Conn {
 	return _connCache.Get(udid)
 }
