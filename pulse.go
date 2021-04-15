@@ -185,21 +185,22 @@ func (pl *pulse) handle(netconn net.Conn) {
 					// type connect,
 					// connect type is handled separately.
 					ctx = pl.connect(netconn, p)
+
+					pAck := new(packet.Packet)
+					pAck.Type = packet.Type_ConnAck
+					pAck.Udid = p.Udid
+
+					if len(p.RequestId) == 0 {
+						ctx = pl.setCtxReqId(ctx, uuid.New().String())
+					} else {
+						ctx = pl.setCtxReqId(ctx, p.RequestId)
+					}
+
+					if p.AuthMode != packet.AuthMode_FullyCustom {
+						ctx = pl.setSecret(ctx, p.Secret)
+					}
+
 					if pl.callConnectFunc != nil {
-						pAck := new(packet.Packet)
-						pAck.Type = packet.Type_ConnAck
-						pAck.Udid = p.Udid
-
-						if len(p.RequestId) == 0 {
-							ctx = pl.setCtxReqId(ctx, uuid.New().String())
-						} else {
-							ctx = pl.setCtxReqId(ctx, p.RequestId)
-						}
-
-						if p.AuthMode != packet.AuthMode_FullyCustom {
-							ctx = pl.setSecret(ctx, p.Secret)
-						}
-
 						repBody, err := pl.callConnectFunc(ctx, p.Body)
 						if err != nil {
 							netconn.Close()
@@ -210,13 +211,17 @@ func (pl *pulse) handle(netconn net.Conn) {
 							// connack type is handled separately.
 							pAck.Body = repBody
 						}
-						rbyte, err := Encode(pAck)
-						if err != nil {
-							log.L().Error(err.Error())
-							netconn.Close()
-							return
-						}
-						netconn.Write(rbyte)
+
+					}
+					rbyte, err := Encode(pAck)
+					if err != nil {
+						log.L().Error(err.Error())
+						netconn.Close()
+						return
+					}
+					_, err = netconn.Write(rbyte)
+					if err != nil {
+						log.L().Error(err.Error())
 					}
 				} else {
 					pl.parse(ctx, netconn, p)

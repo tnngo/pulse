@@ -122,8 +122,7 @@ func (c *Client) handle(netconn net.Conn) {
 	)
 	for {
 		// set timeout.
-		//conn.SetReadDeadline(time.Now().Add(p.readTimeOut))
-		netconn.SetReadDeadline(time.Now().Add(3 * time.Minute))
+		netconn.SetReadDeadline(time.Now().Add(c.readTimeOut))
 		for {
 			b, err := reader.ReadByte()
 			if err != nil {
