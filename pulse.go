@@ -190,6 +190,8 @@ func (pl *pulse) handle(netconn net.Conn) {
 					pAck.Type = packet.Type_ConnAck
 					pAck.Udid = p.Udid
 
+					ctx = pl.setCtxUDID(ctx, p.Udid)
+
 					if len(p.RequestId) == 0 {
 						ctx = pl.setCtxReqId(ctx, uuid.New().String())
 					} else {
