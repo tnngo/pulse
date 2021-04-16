@@ -130,7 +130,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 		varintLen int
 		size      int
 
-		ctx context.Context
+		ctx = context.Background()
 	)
 	for {
 		// set timeout.
@@ -140,11 +140,12 @@ func (pl *pulse) handle(netconn net.Conn) {
 			if err != nil {
 				log.L().Warn(err.Error())
 				netconn.Close()
-				if ctx == nil {
+
+				ctxConn := CtxConn(ctx)
+				if ctxConn == nil {
 					return
 				}
 
-				ctxConn := CtxConn(ctx)
 				if mapConn := _connCache.Get(ctxConn.udid); mapConn == nil {
 					return
 				} else {
@@ -180,16 +181,16 @@ func (pl *pulse) handle(netconn net.Conn) {
 					log.L().Error(err.Error())
 				}
 
+				if len(p.RequestId) == 0 {
+					ctx = pl.setCtxReqId(ctx, uuid.New().String())
+				} else {
+					ctx = pl.setCtxReqId(ctx, p.RequestId)
+				}
+
 				if p.Type == packet.Type_Connect {
 					// type connect,
 					// connect type is handled separately.
-					ctx = pl.connect(netconn, p)
-
-					if len(p.RequestId) == 0 {
-						ctx = pl.setCtxReqId(ctx, uuid.New().String())
-					} else {
-						ctx = pl.setCtxReqId(ctx, p.RequestId)
-					}
+					ctx = pl.connect(ctx, netconn, p)
 
 					if p.AuthMode != packet.AuthMode_FullyCustom {
 						ctx = pl.setSecret(ctx, p.Secret)
@@ -233,7 +234,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 	}
 }
 
-func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
+func (pl *pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet) context.Context {
 	c := newConn(netconn)
 	if len(p.Udid) == 0 {
 		c.udid = uuid.New().String()
@@ -253,21 +254,8 @@ func (pl *pulse) connect(netconn net.Conn, p *packet.Packet) context.Context {
 	c.remoteAddr = netconn.RemoteAddr().String()
 	c.connectTime = time.Now().UnixNano() / 1e6
 	_connCache.Put(c.udid, c)
-	ctx := pl.setCtxConn(context.Background(), c)
+	ctx = pl.setCtxConn(ctx, c)
 	return ctx
-}
-
-// set connection's context.
-func (pl *pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
-	return context.WithValue(ctx, ctx_conn, c)
-}
-
-func (pl *pulse) setCtxReqId(ctx context.Context, reqId string) context.Context {
-	return context.WithValue(ctx, ctx_req_id, reqId)
-}
-
-func (pl *pulse) setSecret(ctx context.Context, secret string) context.Context {
-	return context.WithValue(ctx, ctx_secret, secret)
 }
 
 func (pl *pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
@@ -297,6 +285,19 @@ func (pl *pulse) body(ctx context.Context, p *packet.Packet) {
 		return
 	}
 	f(ctx, p.Body)
+}
+
+// set connection's context.
+func (pl *pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
+	return context.WithValue(ctx, ctx_conn, c)
+}
+
+func (pl *pulse) setCtxReqId(ctx context.Context, reqId string) context.Context {
+	return context.WithValue(ctx, ctx_req_id, reqId)
+}
+
+func (pl *pulse) setSecret(ctx context.Context, secret string) context.Context {
+	return context.WithValue(ctx, ctx_secret, secret)
 }
 
 func (pl *pulse) CallConnect(f callConnectFunc) {
