@@ -15,6 +15,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse"
+	"github.com/tnngo/pulse/ip"
 	"github.com/tnngo/pulse/packet"
 	"github.com/tnngo/pulse/route"
 )
@@ -97,6 +98,8 @@ func (c *Client) connect() ([]byte, error) {
 	if c.authMode == packet.AuthMode_Default || c.authMode == packet.AuthMode_CustomSecret {
 		p.Secret = c.secret
 	}
+
+	p.LocalAddr, _ = ip.GetLocalIP()
 
 	p.Udid = c.udid
 	p.Type = packet.Type_Connect

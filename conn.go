@@ -60,6 +60,10 @@ func (c *Conn) RemoteAddr() string {
 	return c.remoteAddr
 }
 
+func (c *Conn) LocalAddr() string {
+	return c.localAddr
+}
+
 func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
 }
