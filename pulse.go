@@ -155,7 +155,6 @@ func (pl *pulse) handle(netconn net.Conn) {
 				}
 
 				if pl.callCloseFunc != nil {
-					ctx = pl.setCtxReqId(ctx, uuid.New().String())
 					pl.callCloseFunc(ctx)
 				}
 				return
