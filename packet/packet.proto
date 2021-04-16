@@ -5,7 +5,7 @@ option go_package = "packet";
 
 enum Type {
     // Unknown reserved.
-    Unknown = 0;
+    Unknown1 = 0;
     // Connect client request to connect to Server.
     Connect = 1;
     // ConnAck connect Acknowledgment.
