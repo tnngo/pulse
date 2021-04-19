@@ -281,12 +281,29 @@ func (pl *Pulse) pong(netconn net.Conn) {
 }
 
 func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
-	f, err := route.Get(p.RouteId)
+	if len(p.RouteGroup) == 0 {
+		f, err := route.Get(p.RouteId)
+		if err != nil {
+			log.L().Error(err.Error())
+			return
+		}
+		f(ctx, p.Body)
+		return
+	}
+
+	if pl.routeGroup == nil {
+		log.L().Debug("route group is nil")
+		return
+	}
+
+	f, err := pl.routeGroup.Get(p.RouteId, p.RouteGroup)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
 	}
+
 	f(ctx, p.Body)
+
 }
 
 // set connection's context.

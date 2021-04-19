@@ -80,12 +80,12 @@ func (rg *RouteGroup) ID(id int32, rf RouteFunc) error {
 	return nil
 }
 
-func (rg *RouteGroup) Get(id int32, name string) (RouteFunc, error) {
-	if len(name) == 0 {
+func (rg *RouteGroup) Get(id int32, group string) (RouteFunc, error) {
+	if len(group) == 0 {
 		return nil, errors.New("name not nil")
 	}
-	if v, ok := routeGroupMap[name]; !ok {
-		return nil, fmt.Errorf("%s group name does not exist", name)
+	if v, ok := routeGroupMap[group]; !ok {
+		return nil, fmt.Errorf("%s group name does not exist", group)
 	} else {
 		if v1, ok := v[id]; !ok {
 			return nil, fmt.Errorf("%d route id does not exist", id)
