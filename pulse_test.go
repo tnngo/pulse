@@ -10,9 +10,9 @@ import (
 
 func Test_pulse_Listen(t *testing.T) {
 	log.NewSimple()
-	p := &pulse{
-		network: "tcp",
-		port:    8080,
+	p := &Pulse{
+		Network: "tcp",
+		Port:    8080,
 	}
 	if err := p.listen(); err != nil {
 		t.Error(err)
@@ -25,9 +25,9 @@ func Test_pulse_handle(t *testing.T) {
 	go func() {
 		s.Close()
 	}()
-	p := &pulse{
-		network:     "tcp",
-		port:        8080,
+	p := &Pulse{
+		Network:     "tcp",
+		Port:        8080,
 		readTimeOut: 1 * time.Second,
 	}
 	p.handle(c)

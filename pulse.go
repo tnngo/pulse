@@ -30,9 +30,9 @@ type (
 	callCloseFunc   func(context.Context)
 )
 
-type pulse struct {
-	network     string
-	port        int
+type Pulse struct {
+	Network     string
+	Port        int
 	readTimeOut time.Duration
 
 	// buffer pool.
@@ -42,20 +42,22 @@ type pulse struct {
 
 	callConnectFunc callConnectFunc
 	callCloseFunc   callCloseFunc
+
+	routeGroup *route.RouteGroup
 }
 
 // network: tcp、udp
-func New(network string, port int) *pulse {
+func New(network string, port int) *Pulse {
 	return newPulse(network, port)
 }
 
-func newPulse(network string, port int) *pulse {
+func newPulse(network string, port int) *Pulse {
 	if log.L() == nil {
 		log.NewSimple()
 	}
-	pulse := &pulse{
-		network: network,
-		port:    port,
+	pulse := &Pulse{
+		Network: network,
+		Port:    port,
 		bufferPool: &sync.Pool{
 			New: func() interface{} {
 				return new(bytes.Buffer)
@@ -70,29 +72,29 @@ func newPulse(network string, port int) *pulse {
 	return pulse
 }
 
-func (pl *pulse) ReadTimeOut(t time.Duration) *pulse {
+func (pl *Pulse) ReadTimeOut(t time.Duration) *Pulse {
 	pl.readTimeOut = t
 	return pl
 }
 
-func (pl *pulse) Listen() error {
+func (pl *Pulse) Listen() error {
 	if pl.readTimeOut == 0 {
 		pl.readTimeOut = 60 * time.Second
 	}
-	switch pl.network {
+	switch pl.Network {
 	case "tcp", "tcp4", "tcp6":
 		return pl.listen()
 	case "udp", "udp4", "udp6":
 		// TODO
 		return nil
 	default:
-		return errors.New("Unsupported network protocol: " + pl.network)
+		return errors.New("Unsupported network protocol: " + pl.Network)
 	}
 }
 
-func (pl *pulse) listen() error {
-	addr := fmt.Sprintf(":%d", pl.port)
-	ln, err := net.Listen(pl.network, addr)
+func (pl *Pulse) listen() error {
+	addr := fmt.Sprintf(":%d", pl.Port)
+	ln, err := net.Listen(pl.Network, addr)
 	if err != nil {
 		return err
 	}
@@ -101,16 +103,16 @@ func (pl *pulse) listen() error {
 	if err != nil {
 		return err
 	}
-	localAddr := fmt.Sprintf("%s:%d", ipAddr, pl.port)
+	localAddr := fmt.Sprintf("%s:%d", ipAddr, pl.Port)
 
-	log.L().Info("server started successfully", zap.String("listen", localAddr), zap.String("network", pl.network))
+	log.L().Info("server started successfully", zap.String("listen", localAddr), zap.String("network", pl.Network))
 
 	pl.accept(ln)
 	return nil
 }
 
 // receive tcp connection and message.
-func (s *pulse) accept(ln net.Listener) {
+func (s *Pulse) accept(ln net.Listener) {
 	for {
 		tcpConn, err := ln.Accept()
 		if err != nil {
@@ -122,7 +124,7 @@ func (s *pulse) accept(ln net.Listener) {
 }
 
 // handling connections and messages。
-func (pl *pulse) handle(netconn net.Conn) {
+func (pl *Pulse) handle(netconn net.Conn) {
 	reader := bufio.NewReader(netconn)
 	buf := pl.bufferPool.Get().(*bytes.Buffer)
 	var (
@@ -234,7 +236,7 @@ func (pl *pulse) handle(netconn net.Conn) {
 	}
 }
 
-func (pl *pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet) context.Context {
+func (pl *Pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet) context.Context {
 	c := newConn(netconn)
 	if len(p.Udid) == 0 {
 		c.udid = uuid.New().String()
@@ -258,7 +260,7 @@ func (pl *pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet
 	return ctx
 }
 
-func (pl *pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
+func (pl *Pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
 	switch p.Type {
 	case packet.Type_Ping:
 		pl.pong(netconn)
@@ -267,7 +269,7 @@ func (pl *pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) 
 	}
 }
 
-func (pl *pulse) pong(netconn net.Conn) {
+func (pl *Pulse) pong(netconn net.Conn) {
 	wp := new(packet.Packet)
 	wp.Type = packet.Type_Pong
 	b, err := Encode(wp)
@@ -278,7 +280,7 @@ func (pl *pulse) pong(netconn net.Conn) {
 	netconn.Write(b)
 }
 
-func (pl *pulse) body(ctx context.Context, p *packet.Packet) {
+func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 	f, err := route.Get(p.RouteId)
 	if err != nil {
 		log.L().Error(err.Error())
@@ -288,24 +290,28 @@ func (pl *pulse) body(ctx context.Context, p *packet.Packet) {
 }
 
 // set connection's context.
-func (pl *pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
+func (pl *Pulse) setCtxConn(ctx context.Context, c *Conn) context.Context {
 	return context.WithValue(ctx, ctx_conn, c)
 }
 
-func (pl *pulse) setCtxReqId(ctx context.Context, reqId string) context.Context {
+func (pl *Pulse) setCtxReqId(ctx context.Context, reqId string) context.Context {
 	return context.WithValue(ctx, ctx_req_id, reqId)
 }
 
-func (pl *pulse) setSecret(ctx context.Context, secret string) context.Context {
+func (pl *Pulse) setSecret(ctx context.Context, secret string) context.Context {
 	return context.WithValue(ctx, ctx_secret, secret)
 }
 
-func (pl *pulse) CallConnect(f callConnectFunc) {
+func (pl *Pulse) CallConnect(f callConnectFunc) {
 	pl.callConnectFunc = f
 }
 
-func (pl *pulse) CallClose(f callCloseFunc) {
+func (pl *Pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
+}
+
+func (pl *Pulse) RouteGroup(rg *route.RouteGroup) {
+	pl.routeGroup = rg
 }
 
 // Encode encapsulate protobuf.

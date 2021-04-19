@@ -26,7 +26,7 @@ func routeTest(ctx context.Context, body []byte) error {
 }
 
 func main() {
-	route.Put(1, routeTest)
+	route.ID(1, routeTest)
 
 	pl := pulse.New("tcp", 8080)
 	pl.CallConnect(connect)
