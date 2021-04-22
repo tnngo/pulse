@@ -42,8 +42,6 @@ type Pulse struct {
 
 	callConnectFunc callConnectFunc
 	callCloseFunc   callCloseFunc
-
-	routeGroup *route.RouteGroup
 }
 
 // network: tcp、udp
@@ -282,28 +280,22 @@ func (pl *Pulse) pong(netconn net.Conn) {
 
 func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 	if len(p.RouteGroup) == 0 {
-		f, err := route.Get(p.RouteId)
+		rf, err := route.GetRoute(p.RouteId)
 		if err != nil {
 			log.L().Error(err.Error())
 			return
 		}
-		f(ctx, p.Body)
+		rf(ctx, p.Body)
 		return
 	}
 
-	if pl.routeGroup == nil {
-		log.L().Debug("route group is nil")
-		return
-	}
-
-	f, err := pl.routeGroup.Get(p.RouteId, p.RouteGroup)
+	f, err := route.GetRouteGroup(p.RouteId, p.RouteGroup)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
 	}
 
 	f(ctx, p.Body)
-
 }
 
 // set connection's context.
@@ -325,10 +317,6 @@ func (pl *Pulse) CallConnect(f callConnectFunc) {
 
 func (pl *Pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
-}
-
-func (pl *Pulse) RouteGroup(rg *route.RouteGroup) {
-	pl.routeGroup = rg
 }
 
 // Encode encapsulate protobuf.

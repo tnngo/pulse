@@ -192,11 +192,22 @@ func (c *Client) parse(p *packet.Packet) {
 }
 
 func (c *Client) body(p *packet.Packet) {
-	f, err := route.Get(p.RouteId)
+	if len(p.RouteGroup) == 0 {
+		rf, err := route.GetRoute(p.RouteId)
+		if err != nil {
+			log.L().Error(err.Error())
+			return
+		}
+		rf(context.Background(), p.Body)
+		return
+	}
+
+	f, err := route.GetRouteGroup(p.RouteId, p.RouteGroup)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
 	}
+
 	f(context.Background(), p.Body)
 }
 

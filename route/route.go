@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/tnngo/log"
 )
 
 // RouteFunc route function type.
@@ -17,78 +19,62 @@ var (
 	ErrRouteNotExist error
 	// ErrRouteType route type is error.
 	ErrRouteType error
-
-	_route *route
 )
 
 type route struct {
-	routeMap map[int32]RouteFunc
+	group string
 }
 
-func ID(id int32, rf RouteFunc) error {
-	if rf == nil {
-		return ErrRouteNil
+var routeMap = make(map[string]map[int32]RouteFunc)
+
+// ID default ROUTE GROUP NAME is equal to empty.
+func ID(id int32, rf RouteFunc) {
+	if _, ok := routeMap[""][id]; ok {
+		log.L().Sugar().Errorf("id already exists, id=%d", id)
+		return
 	}
 
-	if _route == nil {
-		_route = &route{
-			routeMap: make(map[int32]RouteFunc),
+	routeMap[""][id] = rf
+}
+
+func RouteGroup(group string) (*route, error) {
+	if _, ok := routeMap[group]; ok {
+		return nil, errors.New("group name repeated: " + group)
+	}
+	routeMap[group] = make(map[int32]RouteFunc)
+
+	return &route{
+		group: group,
+	}, nil
+}
+
+func (rg *route) ID(id int32, rf RouteFunc) error {
+	if v, ok := routeMap[rg.group]; ok {
+		if _, ok := v[id]; ok {
+			ErrRouteExist = fmt.Errorf("route already exists. group=%s", rg.group)
 		}
-	}
-
-	if _, ok := _route.routeMap[id]; ok {
-		ErrRouteExist = fmt.Errorf("route already exists. routeid=%d", id)
 		return ErrRouteExist
 	}
-	_route.routeMap[id] = rf
 	return nil
 }
 
-func Get(key int32) (RouteFunc, error) {
-	if v, ok := _route.routeMap[key]; !ok {
-		ErrRouteNotExist = fmt.Errorf("route not found：%d", key)
-		return nil, ErrRouteExist
+func GetRoute(id int32) (RouteFunc, error) {
+	if v, ok := routeMap[""][id]; !ok {
+		return nil, fmt.Errorf("route %d does not exist", id)
 	} else {
 		return v, nil
 	}
 }
 
-type RouteGroup struct {
-	name string
-}
-
-var routeGroupMap = make(map[string]map[int32]RouteFunc)
-
-func NewGroup(groupName string) (*RouteGroup, error) {
-	if _, ok := routeGroupMap[groupName]; ok {
-		return nil, errors.New("group name repeated: " + groupName)
-	}
-	routeGroupMap[groupName] = make(map[int32]RouteFunc)
-
-	return &RouteGroup{
-		name: groupName,
-	}, nil
-}
-
-func (rg *RouteGroup) ID(id int32, rf RouteFunc) error {
-	if v, ok := routeGroupMap[rg.name]; ok {
-		if _, ok := v[id]; ok {
-			ErrRouteExist = fmt.Errorf("route already exists. routeName=%s, routeid=%d", rg.name, id)
-		}
-		return ErrRouteExist
-	}
-	return nil
-}
-
-func (rg *RouteGroup) Get(id int32, group string) (RouteFunc, error) {
+func GetRouteGroup(id int32, group string) (RouteFunc, error) {
 	if len(group) == 0 {
-		return nil, errors.New("name not nil")
+		return nil, errors.New("group not nil")
 	}
-	if v, ok := routeGroupMap[group]; !ok {
-		return nil, fmt.Errorf("%s group name does not exist", group)
+	if v, ok := routeMap[group]; !ok {
+		return nil, fmt.Errorf("group %s does not exist", group)
 	} else {
 		if v1, ok := v[id]; !ok {
-			return nil, fmt.Errorf("%d route id does not exist", id)
+			return nil, fmt.Errorf("route %d does not exist", id)
 		} else {
 			return v1, nil
 		}
