@@ -34,6 +34,10 @@ func ID(id int32, rf RouteFunc) {
 		return
 	}
 
+	if routeMap[""][id] == nil {
+		routeMap[""] = make(map[int32]RouteFunc)
+	}
+
 	routeMap[""][id] = rf
 }
 
@@ -54,6 +58,9 @@ func (rg *route) ID(id int32, rf RouteFunc) error {
 			ErrRouteExist = fmt.Errorf("route already exists. group=%s", rg.group)
 		}
 		return ErrRouteExist
+	}
+	if routeMap[rg.group] == nil {
+		routeMap[rg.group] = make(map[int32]RouteFunc)
 	}
 	return nil
 }
