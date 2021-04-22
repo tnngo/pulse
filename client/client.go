@@ -6,7 +6,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha1"
-	"encoding/hex"
+	"encoding/base64"
 	"errors"
 	"net"
 	"sync"
@@ -242,8 +242,7 @@ func (c *Client) Secret(key, value string) {
 	hsha1 := hmac.New(sha1.New, []byte(key+"."+value))
 	hsha1.Write([]byte(key + "." + value + "." + c.udid))
 	result := hsha1.Sum(nil)
-	hex16 := hex.EncodeToString(result)
-	c.secret = hex16
+	c.secret = base64.StdEncoding.EncodeToString(result)
 }
 
 func (c *Client) EnalbeFullyCustom() {
