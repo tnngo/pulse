@@ -3,7 +3,6 @@ package pulse
 import (
 	"net"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/tnngo/pulse/packet"
 )
 
@@ -35,7 +34,7 @@ func (c *Conn) writeRoute(id int32, body []byte) error {
 	p.RouteId = id
 	p.Body = body
 
-	b, err := proto.Marshal(p)
+	b, err := Encode(p)
 	if err != nil {
 		return err
 	}

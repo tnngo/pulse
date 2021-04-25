@@ -27,7 +27,7 @@ type route struct {
 
 var routeMap = make(map[string]map[int32]RouteFunc)
 
-// ID default ROUTE GROUP NAME is equal to empty.
+// ID default route group name is equal to empty.
 func ID(id int32, rf RouteFunc) {
 	if _, ok := routeMap[""][id]; ok {
 		log.L().Sugar().Errorf("id already exists, id=%d", id)
