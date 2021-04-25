@@ -34,7 +34,7 @@ func ID(id int32, rf RouteFunc) {
 		return
 	}
 
-	if routeMap[""][id] == nil {
+	if routeMap[""] == nil {
 		routeMap[""] = make(map[int32]RouteFunc)
 	}
 
@@ -59,9 +59,11 @@ func (rg *route) ID(id int32, rf RouteFunc) error {
 		}
 		return ErrRouteExist
 	}
+
 	if routeMap[rg.group] == nil {
 		routeMap[rg.group] = make(map[int32]RouteFunc)
 	}
+	routeMap[rg.group][id] = rf
 	return nil
 }
 
