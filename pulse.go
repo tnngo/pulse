@@ -360,3 +360,7 @@ func CtxSecret(ctx context.Context) string {
 func CacheConn(udid string) *Conn {
 	return _connCache.Get(udid)
 }
+
+func CacheConns() []*Conn {
+	return _connCache.List()
+}
