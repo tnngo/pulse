@@ -17,9 +17,16 @@ func main() {
 	c := client.New("tcp", ":8080")
 	c.UDID("123")
 	c.CallConnAck(connAck)
-	go c.Dial()
-	time.Sleep(1 * time.Second)
-	c.WriteRoute(1, []byte("test"))
+	c.Dial()
 
-	select {}
+	for {
+		err := c.WriteRoute(1, []byte("test"))
+		if err != nil {
+			log.L().Error(err.Error())
+		}
+
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	//select {}
 }

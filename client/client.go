@@ -62,7 +62,7 @@ func (c *Client) Dial() {
 	if c.readTimeOut == 0 {
 		c.readTimeOut = c.heartRate + 30*time.Second
 	}
-	c.dial()
+	go c.dial()
 }
 
 func (c *Client) dial() {
