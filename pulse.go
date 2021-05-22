@@ -42,10 +42,10 @@ type Pulse struct {
 	// packet object pool.
 	packetPool *sync.Pool
 
-	callConnectFunc callConnectFunc
-	callCloseFunc   callCloseFunc
-	callForwardFunc callForwardFunc
-	callNormalFunc  callNormalFunc
+	callConnectFunc  callConnectFunc
+	callCloseFunc    callCloseFunc
+	callSelfProcFunc callForwardFunc
+	callNormalFunc   callNormalFunc
 }
 
 // network: tcp、udp
@@ -288,10 +288,11 @@ func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 		if pl.callNormalFunc != nil {
 			pl.callNormalFunc(ctx, p.Msg)
 		}
+		return
 	}
-	if p.RouteMode == packet.RouteMode_Forward {
-		if pl.callForwardFunc != nil {
-			pl.callForwardFunc(ctx, p.Route, p.Msg)
+	if p.RouteMode == packet.RouteMode_SelfProc {
+		if pl.callSelfProcFunc != nil {
+			pl.callSelfProcFunc(ctx, p.Route, p.Msg)
 		}
 		return
 	}
@@ -346,8 +347,8 @@ func (pl *Pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
 }
 
-func (pl *Pulse) CallForward(f callForwardFunc) {
-	pl.callForwardFunc = f
+func (pl *Pulse) CallSelfProc(f callForwardFunc) {
+	pl.callSelfProcFunc = f
 }
 
 func (pl *Pulse) CallNormal(f callNormalFunc) {
