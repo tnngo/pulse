@@ -28,8 +28,8 @@ enum AuthMode {
 }
 
 enum RouteMode {
-    Not = 0;
-    Normal = 1;
+    Normal = 0;
+    Routes = 1;
     Forward = 2;
 }
 
