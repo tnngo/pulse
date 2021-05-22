@@ -44,11 +44,18 @@ message Packet {
     string secret = 51;
     /** Auth. End**/
 
-    /** Msg. Begin**/
-    string route_group = 95;
-    int32 route_id = 96;
+    /** Other. Begin**/
     string request_id = 97;
     string local_addr = 98;
-    bytes body = 99;
+    /** Other. ned**/
+
+    /** Msg. Begin**/
+    Msg msg = 99;
     /** Msg. End**/
+}
+
+message Msg {
+    string group = 1;
+    int32 id = 2;
+    bytes body = 99;
 }
