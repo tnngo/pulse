@@ -29,6 +29,7 @@ enum AuthMode {
 
 // Packet packet message structure。
 message Packet {
+    /** Basic header field. Begin**/
     // Type packet type
     Type type = 1;
     // Udid Unique identification of device terminal.
@@ -36,11 +37,18 @@ message Packet {
     // AppName Sometimes the same type of device will have different business scenarios, 
     // so the applications in the device will be named differently.
     string app_name = 3;
-    AuthMode auth_mode = 4;
-    string secret = 5;
-    string route_group = 6;
-    int32 route_id = 7;
+    /** Basic header field. End**/
+
+    /** Auth. Begin**/
+    AuthMode auth_mode = 50;
+    string secret = 51;
+    /** Auth. End**/
+
+    /** Msg. Begin**/
+    string route_group = 95;
+    int32 route_id = 96;
     string request_id = 97;
     string local_addr = 98;
     bytes body = 99;
+    /** Msg. End**/
 }
