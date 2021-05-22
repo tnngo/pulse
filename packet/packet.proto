@@ -27,27 +27,19 @@ enum AuthMode {
     Not = 99;
 }
 
-message Header {
-    // Udid Unique identification of device terminal.
-    string udid = 1;
-    // AppName Sometimes the same type of device will have different business scenarios, 
-    // so the applications in the device will be named differently.
-    string app_name = 2;
-    AuthMode auth_mode = 3;
-    string secret = 4;
-}
-
-message Route {
-    string group = 1;
-    int32 id = 2;
-}
-
 // Packet packet message structure。
 message Packet {
     // Type packet type
     Type type = 1;
-    Header header = 2;
-    Route route = 3;
+    // Udid Unique identification of device terminal.
+    string udid = 2;
+    // AppName Sometimes the same type of device will have different business scenarios, 
+    // so the applications in the device will be named differently.
+    string app_name = 3;
+    AuthMode auth_mode = 4;
+    string secret = 5;
+    string route_group = 6;
+    int32 route_id = 7;
     string request_id = 97;
     string local_addr = 98;
     bytes body = 99;
