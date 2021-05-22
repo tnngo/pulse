@@ -196,8 +196,14 @@ func (c *Client) body(p *packet.Packet) {
 		log.L().Warn("packet.Msg is nil")
 		return
 	}
-	if p.Msg.RouteGroup == "pulse" {
-		rf, err := route.GetRoute(p.Msg.RouteId)
+
+	if p.Route == nil {
+		log.L().Warn("packet.Route is nil")
+		return
+	}
+
+	if p.Route.Group == "pulse" {
+		rf, err := route.GetRoute(p.Route.Id)
 		if err != nil {
 			log.L().Error(err.Error())
 			return
@@ -206,7 +212,7 @@ func (c *Client) body(p *packet.Packet) {
 		return
 	}
 
-	f, err := route.GetRouteGroup(p.Msg.RouteId, p.Msg.RouteGroup)
+	f, err := route.GetRouteGroup(p.Route.Id, p.Route.Group)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
