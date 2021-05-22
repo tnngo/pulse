@@ -29,7 +29,7 @@ type (
 	callConnectFunc func(context.Context, *packet.Msg) (*packet.Msg, error)
 	callCloseFunc   func(context.Context)
 
-	forwardFunc func(context.Context, *packet.Route, *packet.Msg)
+	callForwardFunc func(context.Context, *packet.Route, *packet.Msg)
 )
 
 type Pulse struct {
@@ -44,7 +44,7 @@ type Pulse struct {
 
 	callConnectFunc callConnectFunc
 	callCloseFunc   callCloseFunc
-	forwardFunc     forwardFunc
+	callForwardFunc callForwardFunc
 }
 
 // network: tcp、udp
@@ -284,10 +284,10 @@ func (pl *Pulse) pong(netconn net.Conn) {
 
 func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 	if p.RouteMode == packet.RouteMode_Forward {
-		if pl.forwardFunc == nil {
+		if pl.callForwardFunc == nil {
 			log.L().Warn("FrowardFunc is nil")
 		} else {
-			pl.forwardFunc(ctx, p.Route, p.Msg)
+			pl.callForwardFunc(ctx, p.Route, p.Msg)
 		}
 		return
 	}
@@ -340,6 +340,10 @@ func (pl *Pulse) CallConnect(f callConnectFunc) {
 
 func (pl *Pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
+}
+
+func (pl *Pulse) CallForward(f callForwardFunc) {
+	pl.callForwardFunc = f
 }
 
 // Encode encapsulate protobuf.
