@@ -21,8 +21,8 @@ import (
 )
 
 type (
-	callConnectFunc func() []byte
-	callConnAckFunc func(context.Context, []byte)
+	callConnectFunc func() *packet.Msg
+	callConnAckFunc func(context.Context, *packet.Msg)
 	callCloseFunc   func(context.Context)
 )
 
@@ -93,9 +93,9 @@ func (c *Client) dial() {
 func (c *Client) connect() ([]byte, error) {
 	p := new(packet.Packet)
 	if c.callConnectFunc != nil {
-		p.Body = c.callConnectFunc()
+		p.Msg = c.callConnectFunc()
 	}
-	if c.authMode == packet.AuthMode_Default || c.authMode == packet.AuthMode_CustomSecret {
+	if c.authMode == packet.AuthMode_HmacSha1 {
 		p.Secret = c.secret
 	}
 
@@ -150,7 +150,7 @@ func (c *Client) handle(netconn net.Conn) {
 				if p.Type == packet.Type_ConnAck {
 					log.L().Info("successfully connected to the server")
 					if c.callConnAckFunc != nil {
-						c.callConnAckFunc(context.Background(), p.Body)
+						c.callConnAckFunc(context.Background(), p.Msg)
 					}
 					c.setConn(netconn)
 					go c.heartbeat()
@@ -192,23 +192,27 @@ func (c *Client) parse(p *packet.Packet) {
 }
 
 func (c *Client) body(p *packet.Packet) {
-	if len(p.RouteGroup) == 0 {
-		rf, err := route.GetRoute(p.RouteId)
+	if p.Msg == nil {
+		log.L().Warn("packet.Msg is nil")
+		return
+	}
+	if p.Msg.RouteGroup == "pulse" {
+		rf, err := route.GetRoute(p.Msg.RouteId)
 		if err != nil {
 			log.L().Error(err.Error())
 			return
 		}
-		rf(context.Background(), p.Body)
+		rf(context.Background(), p.Msg)
 		return
 	}
 
-	f, err := route.GetRouteGroup(p.RouteId, p.RouteGroup)
+	f, err := route.GetRouteGroup(p.Msg.RouteId, p.Msg.RouteGroup)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
 	}
 
-	f(context.Background(), p.Body)
+	f(context.Background(), p.Msg)
 }
 
 func (c *Client) getConn() net.Conn {
@@ -223,16 +227,15 @@ func (c *Client) setConn(netconn net.Conn) {
 	c.netconn = netconn
 }
 
-func (c *Client) writeRoute(id int32, reqId string, body []byte) error {
+func (c *Client) writeMsg(msg *packet.Msg) error {
 	if c.getConn() == nil {
 		return errors.New("No connection available, the connection object is nil")
 	}
 
 	p := new(packet.Packet)
-	p.RequestId = reqId
-	p.RouteId = id
 	p.Type = packet.Type_Body
-	p.Body = body
+	p.Msg = msg
+
 	b, err := pulse.Encode(p)
 	if err != nil {
 		return err
@@ -256,16 +259,6 @@ func (c *Client) Secret(key, value string) {
 	c.secret = base64.StdEncoding.EncodeToString(result)
 }
 
-func (c *Client) EnalbeFullyCustom() {
-	c.authMode = packet.AuthMode_FullyCustom
-}
-
-// EnableCustomSecret this method cannot be used with Secret at the same time.
-func (c *Client) EnableCustomSecret(secret string) {
-	c.authMode = packet.AuthMode_CustomSecret
-	c.secret = secret
-}
-
 func (c *Client) CallConnect(f callConnectFunc) {
 	c.callConnectFunc = f
 }
@@ -274,10 +267,6 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }
 
-func (c *Client) WriteRoute(id int32, body []byte) error {
-	return c.writeRoute(id, "", body)
-}
-
-func (c *Client) WriteRouteReqId(id int32, reqId string, body []byte) error {
-	return c.writeRoute(id, reqId, body)
+func (c *Client) WriteMsg(msg *packet.Msg) error {
+	return c.writeMsg(msg)
 }

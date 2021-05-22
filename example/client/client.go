@@ -6,10 +6,11 @@ import (
 
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse/client"
+	"github.com/tnngo/pulse/packet"
 )
 
-func connAck(ctx context.Context, body []byte) {
-	log.L().Debug(string(body))
+func connAck(ctx context.Context, msg *packet.Msg) {
+	log.L().Debug(string(msg.Body))
 }
 
 func main() {

@@ -1,6 +1,7 @@
 package pulse
 
 import (
+	"errors"
 	"net"
 
 	"github.com/tnngo/pulse/packet"
@@ -27,12 +28,14 @@ func newConn(netconn net.Conn) *Conn {
 	}
 }
 
-func (c *Conn) writeRoute(id int32, body []byte) error {
+func (c *Conn) writeMsg(msg *packet.Msg) error {
+	if msg == nil {
+		return errors.New("msg is nil")
+	}
 	p := new(packet.Packet)
 	p.Udid = c.udid
 	p.Type = packet.Type_Body
-	p.RouteId = id
-	p.Body = body
+	p.Msg = msg
 
 	b, err := Encode(p)
 	if err != nil {
@@ -67,6 +70,6 @@ func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
 }
 
-func (c *Conn) WriteRoute(id int32, body []byte) error {
-	return c.writeRoute(id, body)
+func (c *Conn) WriteMsg(msg *packet.Msg) error {
+	return c.writeMsg(msg)
 }

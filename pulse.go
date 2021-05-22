@@ -29,7 +29,7 @@ type (
 	callConnectFunc func(context.Context, *packet.Msg) (*packet.Msg, error)
 	callCloseFunc   func(context.Context)
 
-	forwardFunc func(context.Context, *packet.Msg)
+	forwardFunc func(context.Context, *packet.Route, *packet.Msg)
 )
 
 type Pulse struct {
@@ -287,7 +287,7 @@ func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 		if pl.forwardFunc == nil {
 			log.L().Warn("FrowardFunc is nil")
 		} else {
-			pl.forwardFunc(ctx, p.Msg)
+			pl.forwardFunc(ctx, p.Route, p.Msg)
 		}
 		return
 	}
@@ -297,8 +297,13 @@ func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 		return
 	}
 
-	if p.Msg.RouteGroup == "pulse" {
-		rf, err := route.GetRoute(p.Msg.RouteId)
+	if p.Route == nil {
+		log.L().Warn("packet.Route is nil")
+		return
+	}
+
+	if p.Route.Group == "pulse" {
+		rf, err := route.GetRoute(p.Route.Id)
 		if err != nil {
 			log.L().Error(err.Error())
 			return
@@ -307,7 +312,7 @@ func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
 		return
 	}
 
-	f, err := route.GetRouteGroup(p.Msg.RouteId, p.Msg.RouteGroup)
+	f, err := route.GetRouteGroup(p.Route.Id, p.Route.Group)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
