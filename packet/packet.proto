@@ -4,37 +4,37 @@ package packet;
 option go_package = "packet";
 
 enum Type {
-    // Unknown reserved.
-    Unknown1 = 0;
-    // Connect client request to connect to Server.
+    // Reserved.
+    Unknown = 0;
+    // Client request to connect to server.
     Connect = 1;
-    // ConnAck connect Acknowledgment.
+    // Connect Acknowledgment.
     ConnAck = 2;
-    // Ping client sends a heartbeat to the server.
+    // Client sends a heartbeat to the server.
     Ping = 3;
-    // Pong server responds to the client heartbeat
+    // Server responds to the client heartbeat
     Pong = 4;
 
-    // Body msg content.
+    // Msg content.
     Body = 99;
 }
 
 // AuthMode Type = Connect
 enum AuthMode {
     // PULSE default encryption method.
-    // Base64(Hmac+Sha1)
+    // Base64(Hmac+Sha1).
     HmacSha1 = 0;
     Not = 99;
 }
 
-// Packet packet message structure。
+// Packet packet message structure.
 message Packet {
     /** Basic header field. Begin**/
-    // Type packet type
+    // Packet type.
     Type type = 1;
-    // Udid Unique identification of device terminal.
+    // Unique identification of device terminal.
     string udid = 2;
-    // AppName Sometimes the same type of device will have different business scenarios, 
+    // Sometimes the same type of device will have different business scenarios, 
     // so the applications in the device will be named differently.
     string app_name = 3;
     /** Basic header field. End**/
