@@ -93,145 +93,31 @@ func (AuthMode) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_e9ef1a6541f9f9e7, []int{1}
 }
 
-type Header struct {
-	// Udid Unique identification of device terminal.
-	Udid string `protobuf:"bytes,1,opt,name=udid,proto3" json:"udid,omitempty"`
-	// AppName Sometimes the same type of device will have different business scenarios,
-	// so the applications in the device will be named differently.
-	AppName  string   `protobuf:"bytes,2,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
-	AuthMode AuthMode `protobuf:"varint,3,opt,name=auth_mode,json=authMode,proto3,enum=packet.AuthMode" json:"auth_mode,omitempty"`
-	Secret   string   `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
-}
-
-func (m *Header) Reset()         { *m = Header{} }
-func (m *Header) String() string { return proto.CompactTextString(m) }
-func (*Header) ProtoMessage()    {}
-func (*Header) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e9ef1a6541f9f9e7, []int{0}
-}
-func (m *Header) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Header) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Header.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Header) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Header.Merge(m, src)
-}
-func (m *Header) XXX_Size() int {
-	return m.Size()
-}
-func (m *Header) XXX_DiscardUnknown() {
-	xxx_messageInfo_Header.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Header proto.InternalMessageInfo
-
-func (m *Header) GetUdid() string {
-	if m != nil {
-		return m.Udid
-	}
-	return ""
-}
-
-func (m *Header) GetAppName() string {
-	if m != nil {
-		return m.AppName
-	}
-	return ""
-}
-
-func (m *Header) GetAuthMode() AuthMode {
-	if m != nil {
-		return m.AuthMode
-	}
-	return AuthMode_HmacSha1
-}
-
-func (m *Header) GetSecret() string {
-	if m != nil {
-		return m.Secret
-	}
-	return ""
-}
-
-type Route struct {
-	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
-	Id    int32  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (m *Route) Reset()         { *m = Route{} }
-func (m *Route) String() string { return proto.CompactTextString(m) }
-func (*Route) ProtoMessage()    {}
-func (*Route) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e9ef1a6541f9f9e7, []int{1}
-}
-func (m *Route) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Route) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Route.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Route) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Route.Merge(m, src)
-}
-func (m *Route) XXX_Size() int {
-	return m.Size()
-}
-func (m *Route) XXX_DiscardUnknown() {
-	xxx_messageInfo_Route.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Route proto.InternalMessageInfo
-
-func (m *Route) GetGroup() string {
-	if m != nil {
-		return m.Group
-	}
-	return ""
-}
-
-func (m *Route) GetId() int32 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
 // Packet packet message structure。
 type Packet struct {
 	// Type packet type
-	Type      Type    `protobuf:"varint,1,opt,name=type,proto3,enum=packet.Type" json:"type,omitempty"`
-	Header    *Header `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
-	Route     *Route  `protobuf:"bytes,3,opt,name=route,proto3" json:"route,omitempty"`
-	RequestId string  `protobuf:"bytes,97,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	LocalAddr string  `protobuf:"bytes,98,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
-	Body      []byte  `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
+	Type Type `protobuf:"varint,1,opt,name=type,proto3,enum=packet.Type" json:"type,omitempty"`
+	// Udid Unique identification of device terminal.
+	Udid string `protobuf:"bytes,2,opt,name=udid,proto3" json:"udid,omitempty"`
+	// AppName Sometimes the same type of device will have different business scenarios,
+	// so the applications in the device will be named differently.
+	AppName string `protobuf:"bytes,3,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
+	//* Auth. Begin*
+	AuthMode AuthMode `protobuf:"varint,50,opt,name=auth_mode,json=authMode,proto3,enum=packet.AuthMode" json:"auth_mode,omitempty"`
+	Secret   string   `protobuf:"bytes,51,opt,name=secret,proto3" json:"secret,omitempty"`
+	//* Msg. Begin*
+	RouteGroup string `protobuf:"bytes,95,opt,name=route_group,json=routeGroup,proto3" json:"route_group,omitempty"`
+	RouteId    int32  `protobuf:"varint,96,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
+	RequestId  string `protobuf:"bytes,97,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	LocalAddr  string `protobuf:"bytes,98,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
+	Body       []byte `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (m *Packet) Reset()         { *m = Packet{} }
 func (m *Packet) String() string { return proto.CompactTextString(m) }
 func (*Packet) ProtoMessage()    {}
 func (*Packet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e9ef1a6541f9f9e7, []int{2}
+	return fileDescriptor_e9ef1a6541f9f9e7, []int{0}
 }
 func (m *Packet) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -267,18 +153,46 @@ func (m *Packet) GetType() Type {
 	return Type_Unknown1
 }
 
-func (m *Packet) GetHeader() *Header {
+func (m *Packet) GetUdid() string {
 	if m != nil {
-		return m.Header
+		return m.Udid
 	}
-	return nil
+	return ""
 }
 
-func (m *Packet) GetRoute() *Route {
+func (m *Packet) GetAppName() string {
 	if m != nil {
-		return m.Route
+		return m.AppName
 	}
-	return nil
+	return ""
+}
+
+func (m *Packet) GetAuthMode() AuthMode {
+	if m != nil {
+		return m.AuthMode
+	}
+	return AuthMode_HmacSha1
+}
+
+func (m *Packet) GetSecret() string {
+	if m != nil {
+		return m.Secret
+	}
+	return ""
+}
+
+func (m *Packet) GetRouteGroup() string {
+	if m != nil {
+		return m.RouteGroup
+	}
+	return ""
+}
+
+func (m *Packet) GetRouteId() int32 {
+	if m != nil {
+		return m.RouteId
+	}
+	return 0
 }
 
 func (m *Packet) GetRequestId() string {
@@ -305,125 +219,36 @@ func (m *Packet) GetBody() []byte {
 func init() {
 	proto.RegisterEnum("packet.Type", Type_name, Type_value)
 	proto.RegisterEnum("packet.AuthMode", AuthMode_name, AuthMode_value)
-	proto.RegisterType((*Header)(nil), "packet.Header")
-	proto.RegisterType((*Route)(nil), "packet.Route")
 	proto.RegisterType((*Packet)(nil), "packet.Packet")
 }
 
 func init() { proto.RegisterFile("packet.proto", fileDescriptor_e9ef1a6541f9f9e7) }
 
 var fileDescriptor_e9ef1a6541f9f9e7 = []byte{
-	// 402 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x34, 0x52, 0xc1, 0x8a, 0xdb, 0x30,
-	0x14, 0x8c, 0x12, 0xc7, 0x71, 0x5e, 0xd2, 0x20, 0x44, 0x29, 0xee, 0xa1, 0xc6, 0x4d, 0xa1, 0x84,
-	0x85, 0x5d, 0x68, 0xfa, 0x05, 0xd9, 0x5e, 0xb6, 0xd0, 0x2e, 0x8b, 0xda, 0x5e, 0x7a, 0x31, 0x8a,
-	0x24, 0x62, 0x93, 0xb5, 0xa4, 0x7a, 0x65, 0x8a, 0x2f, 0xfd, 0x86, 0x7e, 0x56, 0x7b, 0xdb, 0x63,
-	0x8f, 0x25, 0xf9, 0x91, 0xc5, 0xcf, 0xf6, 0x6d, 0xe6, 0xcd, 0x63, 0x66, 0x9e, 0x10, 0x2c, 0x9d,
-	0x90, 0x47, 0xed, 0xaf, 0x5c, 0x65, 0xbd, 0x65, 0x61, 0xc7, 0xd6, 0xbf, 0x20, 0xbc, 0xd1, 0x42,
-	0xe9, 0x8a, 0x31, 0x08, 0x6a, 0x55, 0xa8, 0x98, 0xa4, 0x64, 0x33, 0xe7, 0x88, 0xd9, 0x4b, 0x88,
-	0x84, 0x73, 0x99, 0x11, 0xa5, 0x8e, 0xc7, 0x38, 0x9f, 0x09, 0xe7, 0x6e, 0x45, 0xa9, 0xd9, 0x25,
-	0xcc, 0x45, 0xed, 0xf3, 0xac, 0xb4, 0x4a, 0xc7, 0x93, 0x94, 0x6c, 0x56, 0x5b, 0x7a, 0xd5, 0x47,
-	0xec, 0x6a, 0x9f, 0x7f, 0xb6, 0x4a, 0xf3, 0x48, 0xf4, 0x88, 0xbd, 0x80, 0xf0, 0x41, 0xcb, 0x4a,
-	0xfb, 0x38, 0x40, 0x9f, 0x9e, 0xad, 0x2f, 0x61, 0xca, 0x6d, 0xed, 0x35, 0x7b, 0x0e, 0xd3, 0x43,
-	0x65, 0x6b, 0xd7, 0xe7, 0x77, 0x84, 0xad, 0x60, 0x5c, 0x28, 0x8c, 0x9e, 0xf2, 0x71, 0xa1, 0xd6,
-	0x7f, 0x09, 0x84, 0x77, 0x18, 0xc2, 0x52, 0x08, 0x7c, 0xe3, 0x34, 0xee, 0xaf, 0xb6, 0xcb, 0x21,
-	0xfb, 0x6b, 0xe3, 0x34, 0x47, 0x85, 0xbd, 0x85, 0x30, 0xc7, 0xdb, 0xd0, 0x60, 0xb1, 0x5d, 0x0d,
-	0x3b, 0xdd, 0xc5, 0xbc, 0x57, 0xd9, 0x1b, 0x98, 0x56, 0x6d, 0x07, 0x3c, 0x63, 0xb1, 0x7d, 0x36,
-	0xac, 0x61, 0x31, 0xde, 0x69, 0xec, 0x15, 0x40, 0xa5, 0x7f, 0xd4, 0xfa, 0xc1, 0x67, 0x85, 0x8a,
-	0x05, 0x96, 0x9c, 0xf7, 0x93, 0x8f, 0xaa, 0x95, 0xef, 0xad, 0x14, 0xf7, 0x99, 0x50, 0xaa, 0x8a,
-	0xf7, 0x9d, 0x8c, 0x93, 0x9d, 0x52, 0xf8, 0xb8, 0x7b, 0xab, 0x9a, 0x58, 0xa6, 0x64, 0xb3, 0xe4,
-	0x88, 0x2f, 0x3e, 0x41, 0xd0, 0x96, 0x65, 0x4b, 0x88, 0xbe, 0x99, 0xa3, 0xb1, 0x3f, 0xcd, 0x3b,
-	0x3a, 0x62, 0x0b, 0x98, 0x7d, 0xb0, 0xc6, 0x68, 0xe9, 0x29, 0x19, 0xc8, 0x4e, 0x1e, 0xe9, 0x98,
-	0x45, 0x10, 0xdc, 0x15, 0xe6, 0x40, 0x27, 0x88, 0xac, 0x39, 0xd0, 0xa0, 0x45, 0xd7, 0x56, 0x35,
-	0x54, 0x5e, 0xbc, 0x86, 0x68, 0x78, 0xf6, 0xd6, 0xf1, 0xa6, 0x14, 0xf2, 0x4b, 0x2e, 0x5a, 0xc7,
-	0x19, 0x4c, 0x6e, 0xad, 0xa7, 0xf2, 0x3a, 0xfd, 0x73, 0x4a, 0xc8, 0xe3, 0x29, 0x21, 0xff, 0x4f,
-	0x09, 0xf9, 0x7d, 0x4e, 0x46, 0x8f, 0xe7, 0x64, 0xf4, 0xef, 0x9c, 0x8c, 0xbe, 0xf7, 0xbf, 0x61,
-	0x1f, 0xe2, 0xe7, 0x78, 0xff, 0x14, 0x00, 0x00, 0xff, 0xff, 0x81, 0x8b, 0x1f, 0xbc, 0x2c, 0x02,
-	0x00, 0x00,
-}
-
-func (m *Header) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Header) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Header) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Secret) > 0 {
-		i -= len(m.Secret)
-		copy(dAtA[i:], m.Secret)
-		i = encodeVarintPacket(dAtA, i, uint64(len(m.Secret)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.AuthMode != 0 {
-		i = encodeVarintPacket(dAtA, i, uint64(m.AuthMode))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.AppName) > 0 {
-		i -= len(m.AppName)
-		copy(dAtA[i:], m.AppName)
-		i = encodeVarintPacket(dAtA, i, uint64(len(m.AppName)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Udid) > 0 {
-		i -= len(m.Udid)
-		copy(dAtA[i:], m.Udid)
-		i = encodeVarintPacket(dAtA, i, uint64(len(m.Udid)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Route) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Route) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Route) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Id != 0 {
-		i = encodeVarintPacket(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Group) > 0 {
-		i -= len(m.Group)
-		copy(dAtA[i:], m.Group)
-		i = encodeVarintPacket(dAtA, i, uint64(len(m.Group)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	// 363 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x34, 0x91, 0xb1, 0xce, 0xd3, 0x30,
+	0x14, 0x85, 0xe3, 0x36, 0x24, 0xe9, 0xfd, 0x23, 0x64, 0x79, 0x40, 0x66, 0x20, 0x04, 0xa6, 0xa8,
+	0x12, 0x95, 0x68, 0x9f, 0xa0, 0x65, 0x00, 0x24, 0xa8, 0xaa, 0x00, 0x0b, 0x4b, 0x70, 0x6d, 0xab,
+	0xad, 0xda, 0xd8, 0x26, 0x75, 0x84, 0xf2, 0x16, 0x3c, 0x09, 0xcf, 0xc1, 0xd8, 0x91, 0x11, 0xb5,
+	0x2f, 0xf2, 0xcb, 0x4e, 0xba, 0x7d, 0xe7, 0x9c, 0x9b, 0xa3, 0xf8, 0x5e, 0x48, 0x0d, 0xe3, 0x47,
+	0x69, 0x67, 0xa6, 0xd1, 0x56, 0x93, 0xa8, 0x57, 0xaf, 0xff, 0x8c, 0x20, 0xda, 0x78, 0x24, 0x39,
+	0x84, 0xb6, 0x33, 0x92, 0xa2, 0x1c, 0x15, 0x4f, 0xe7, 0xe9, 0x6c, 0x98, 0xff, 0xda, 0x19, 0x59,
+	0xfa, 0x84, 0x10, 0x08, 0x5b, 0x71, 0x10, 0x74, 0x94, 0xa3, 0x62, 0x52, 0x7a, 0x26, 0xcf, 0x21,
+	0x61, 0xc6, 0x54, 0x8a, 0xd5, 0x92, 0x8e, 0xbd, 0x1f, 0x33, 0x63, 0xd6, 0xac, 0x96, 0xe4, 0x0d,
+	0x4c, 0x58, 0x6b, 0xf7, 0x55, 0xad, 0x85, 0xa4, 0x73, 0xdf, 0x8a, 0xef, 0xad, 0xcb, 0xd6, 0xee,
+	0x3f, 0x6b, 0x21, 0xcb, 0x84, 0x0d, 0x44, 0x9e, 0x41, 0x74, 0x96, 0xbc, 0x91, 0x96, 0x2e, 0x7c,
+	0xcf, 0xa0, 0xc8, 0x4b, 0x78, 0x68, 0x74, 0x6b, 0x65, 0xb5, 0x6b, 0x74, 0x6b, 0x68, 0xe5, 0x43,
+	0xf0, 0xd6, 0x7b, 0xe7, 0xb8, 0x5f, 0xe8, 0x07, 0x0e, 0x82, 0xfe, 0xc8, 0x51, 0xf1, 0xa4, 0x8c,
+	0xbd, 0xfe, 0x28, 0xc8, 0x0b, 0x80, 0x46, 0xfe, 0x6c, 0xe5, 0xd9, 0xba, 0x90, 0xf9, 0x4f, 0x27,
+	0x83, 0xd3, 0xc7, 0x27, 0xcd, 0xd9, 0xa9, 0x62, 0x42, 0x34, 0x74, 0xdb, 0xc7, 0xde, 0x59, 0x0a,
+	0xd1, 0xb8, 0xf7, 0x6e, 0xb5, 0xe8, 0x28, 0xcf, 0x51, 0x91, 0x96, 0x9e, 0xa7, 0x9f, 0x20, 0x74,
+	0x1b, 0x21, 0x29, 0x24, 0xdf, 0xd4, 0x51, 0xe9, 0x5f, 0xea, 0x2d, 0x0e, 0xc8, 0x03, 0xc4, 0xef,
+	0xb4, 0x52, 0x92, 0x5b, 0x8c, 0xee, 0x62, 0xc9, 0x8f, 0x78, 0x44, 0x12, 0x08, 0x37, 0x07, 0xb5,
+	0xc3, 0x63, 0x4f, 0x5a, 0xed, 0x70, 0xe8, 0x68, 0xa5, 0x45, 0x87, 0xf9, 0xf4, 0x15, 0x24, 0xf7,
+	0x4d, 0xb8, 0xc6, 0x0f, 0x35, 0xe3, 0x5f, 0xf6, 0xcc, 0x35, 0xc6, 0x30, 0x5e, 0x6b, 0x8b, 0xf9,
+	0x2a, 0xff, 0x7b, 0xcd, 0xd0, 0xe5, 0x9a, 0xa1, 0xff, 0xd7, 0x0c, 0xfd, 0xbe, 0x65, 0xc1, 0xe5,
+	0x96, 0x05, 0xff, 0x6e, 0x59, 0xf0, 0x7d, 0xb8, 0xe1, 0x36, 0xf2, 0x27, 0x5d, 0x3c, 0x06, 0x00,
+	0x00, 0xff, 0xff, 0x66, 0x86, 0xd1, 0xa9, 0xe2, 0x01, 0x00, 0x00,
 }
 
 func (m *Packet) Marshal() (dAtA []byte, err error) {
@@ -473,27 +298,49 @@ func (m *Packet) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x8a
 	}
-	if m.Route != nil {
-		{
-			size, err := m.Route.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacket(dAtA, i, uint64(size))
-		}
+	if m.RouteId != 0 {
+		i = encodeVarintPacket(dAtA, i, uint64(m.RouteId))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0x80
+	}
+	if len(m.RouteGroup) > 0 {
+		i -= len(m.RouteGroup)
+		copy(dAtA[i:], m.RouteGroup)
+		i = encodeVarintPacket(dAtA, i, uint64(len(m.RouteGroup)))
+		i--
+		dAtA[i] = 0x5
+		i--
+		dAtA[i] = 0xfa
+	}
+	if len(m.Secret) > 0 {
+		i -= len(m.Secret)
+		copy(dAtA[i:], m.Secret)
+		i = encodeVarintPacket(dAtA, i, uint64(len(m.Secret)))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x9a
+	}
+	if m.AuthMode != 0 {
+		i = encodeVarintPacket(dAtA, i, uint64(m.AuthMode))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x90
+	}
+	if len(m.AppName) > 0 {
+		i -= len(m.AppName)
+		copy(dAtA[i:], m.AppName)
+		i = encodeVarintPacket(dAtA, i, uint64(len(m.AppName)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.Header != nil {
-		{
-			size, err := m.Header.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacket(dAtA, i, uint64(size))
-		}
+	if len(m.Udid) > 0 {
+		i -= len(m.Udid)
+		copy(dAtA[i:], m.Udid)
+		i = encodeVarintPacket(dAtA, i, uint64(len(m.Udid)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -516,46 +363,6 @@ func encodeVarintPacket(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *Header) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Udid)
-	if l > 0 {
-		n += 1 + l + sovPacket(uint64(l))
-	}
-	l = len(m.AppName)
-	if l > 0 {
-		n += 1 + l + sovPacket(uint64(l))
-	}
-	if m.AuthMode != 0 {
-		n += 1 + sovPacket(uint64(m.AuthMode))
-	}
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovPacket(uint64(l))
-	}
-	return n
-}
-
-func (m *Route) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Group)
-	if l > 0 {
-		n += 1 + l + sovPacket(uint64(l))
-	}
-	if m.Id != 0 {
-		n += 1 + sovPacket(uint64(m.Id))
-	}
-	return n
-}
-
 func (m *Packet) Size() (n int) {
 	if m == nil {
 		return 0
@@ -565,13 +372,27 @@ func (m *Packet) Size() (n int) {
 	if m.Type != 0 {
 		n += 1 + sovPacket(uint64(m.Type))
 	}
-	if m.Header != nil {
-		l = m.Header.Size()
+	l = len(m.Udid)
+	if l > 0 {
 		n += 1 + l + sovPacket(uint64(l))
 	}
-	if m.Route != nil {
-		l = m.Route.Size()
+	l = len(m.AppName)
+	if l > 0 {
 		n += 1 + l + sovPacket(uint64(l))
+	}
+	if m.AuthMode != 0 {
+		n += 2 + sovPacket(uint64(m.AuthMode))
+	}
+	l = len(m.Secret)
+	if l > 0 {
+		n += 2 + l + sovPacket(uint64(l))
+	}
+	l = len(m.RouteGroup)
+	if l > 0 {
+		n += 2 + l + sovPacket(uint64(l))
+	}
+	if m.RouteId != 0 {
+		n += 2 + sovPacket(uint64(m.RouteId))
 	}
 	l = len(m.RequestId)
 	if l > 0 {
@@ -593,272 +414,6 @@ func sovPacket(x uint64) (n int) {
 }
 func sozPacket(x uint64) (n int) {
 	return sovPacket(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Header) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacket
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Header: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Header: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Udid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacket
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Udid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AppName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacket
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AppName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthMode", wireType)
-			}
-			m.AuthMode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.AuthMode |= AuthMode(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacket
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacket(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Route) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacket
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Route: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Route: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacket
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Group = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacket(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *Packet) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -910,9 +465,9 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Header", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Udid", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPacket
@@ -922,33 +477,29 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthPacket
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthPacket
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Header == nil {
-				m.Header = &Header{}
-			}
-			if err := m.Header.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.Udid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Route", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AppName", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPacket
@@ -958,28 +509,126 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthPacket
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthPacket
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Route == nil {
-				m.Route = &Route{}
-			}
-			if err := m.Route.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.AppName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 50:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AuthMode", wireType)
+			}
+			m.AuthMode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AuthMode |= AuthMode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 51:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 95:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RouteGroup", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RouteGroup = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 96:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RouteId", wireType)
+			}
+			m.RouteId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RouteId |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		case 97:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)
