@@ -6,10 +6,11 @@ import (
 	"fmt"
 
 	"github.com/tnngo/log"
+	"github.com/tnngo/pulse/packet"
 )
 
 // RouteFunc route function type.
-type RouteFunc func(context.Context, []byte) error
+type RouteFunc func(context.Context, *packet.Msg) error
 
 var (
 	ErrRouteNil = errors.New("Route type value cannot be nil")
@@ -42,6 +43,9 @@ func ID(id int32, rf RouteFunc) {
 }
 
 func RouteGroup(group string) (*route, error) {
+	if group == "pulse" {
+		return nil, errors.New("pulse is default group name")
+	}
 	if _, ok := routeMap[group]; ok {
 		return nil, errors.New("group name repeated: " + group)
 	}
