@@ -96,18 +96,18 @@ func (AuthMode) EnumDescriptor() ([]byte, []int) {
 type RouteMode int32
 
 const (
-	RouteMode_Route   RouteMode = 0
-	RouteMode_Forward RouteMode = 1
+	RouteMode_RouteMsg RouteMode = 0
+	RouteMode_Forward  RouteMode = 1
 )
 
 var RouteMode_name = map[int32]string{
-	0: "Route",
+	0: "RouteMsg",
 	1: "Forward",
 }
 
 var RouteMode_value = map[string]int32{
-	"Route":   0,
-	"Forward": 1,
+	"RouteMsg": 0,
+	"Forward":  1,
 }
 
 func (x RouteMode) String() string {
@@ -116,6 +116,58 @@ func (x RouteMode) String() string {
 
 func (RouteMode) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_e9ef1a6541f9f9e7, []int{2}
+}
+
+type Route struct {
+	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	Id    int32  `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *Route) Reset()         { *m = Route{} }
+func (m *Route) String() string { return proto.CompactTextString(m) }
+func (*Route) ProtoMessage()    {}
+func (*Route) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e9ef1a6541f9f9e7, []int{0}
+}
+func (m *Route) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Route) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Route.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Route) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Route.Merge(m, src)
+}
+func (m *Route) XXX_Size() int {
+	return m.Size()
+}
+func (m *Route) XXX_DiscardUnknown() {
+	xxx_messageInfo_Route.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Route proto.InternalMessageInfo
+
+func (m *Route) GetGroup() string {
+	if m != nil {
+		return m.Group
+	}
+	return ""
+}
+
+func (m *Route) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
 }
 
 // Packet packet message structure.
@@ -131,9 +183,10 @@ type Packet struct {
 	AuthMode AuthMode `protobuf:"varint,50,opt,name=auth_mode,json=authMode,proto3,enum=packet.AuthMode" json:"auth_mode,omitempty"`
 	Secret   string   `protobuf:"bytes,51,opt,name=secret,proto3" json:"secret,omitempty"`
 	//* Other. Begin*
-	LocalAddr string `protobuf:"bytes,80,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
+	LocalAddr string `protobuf:"bytes,70,opt,name=local_addr,json=localAddr,proto3" json:"local_addr,omitempty"`
 	//* Route msg. Begin*
-	RouteMode RouteMode `protobuf:"varint,98,opt,name=route_mode,json=routeMode,proto3,enum=packet.RouteMode" json:"route_mode,omitempty"`
+	RouteMode RouteMode `protobuf:"varint,90,opt,name=route_mode,json=routeMode,proto3,enum=packet.RouteMode" json:"route_mode,omitempty"`
+	Route     *Route    `protobuf:"bytes,91,opt,name=route,proto3" json:"route,omitempty"`
 	Msg       *Msg      `protobuf:"bytes,99,opt,name=msg,proto3" json:"msg,omitempty"`
 }
 
@@ -141,7 +194,7 @@ func (m *Packet) Reset()         { *m = Packet{} }
 func (m *Packet) String() string { return proto.CompactTextString(m) }
 func (*Packet) ProtoMessage()    {}
 func (*Packet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e9ef1a6541f9f9e7, []int{0}
+	return fileDescriptor_e9ef1a6541f9f9e7, []int{1}
 }
 func (m *Packet) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -216,7 +269,14 @@ func (m *Packet) GetRouteMode() RouteMode {
 	if m != nil {
 		return m.RouteMode
 	}
-	return RouteMode_Route
+	return RouteMode_RouteMsg
+}
+
+func (m *Packet) GetRoute() *Route {
+	if m != nil {
+		return m.Route
+	}
+	return nil
 }
 
 func (m *Packet) GetMsg() *Msg {
@@ -227,17 +287,15 @@ func (m *Packet) GetMsg() *Msg {
 }
 
 type Msg struct {
-	RouteGroup string `protobuf:"bytes,1,opt,name=route_group,json=routeGroup,proto3" json:"route_group,omitempty"`
-	RouteId    int32  `protobuf:"varint,2,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
-	RequestId  string `protobuf:"bytes,98,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	Body       []byte `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
+	RequestId string `protobuf:"bytes,98,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Body      []byte `protobuf:"bytes,99,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (m *Msg) Reset()         { *m = Msg{} }
 func (m *Msg) String() string { return proto.CompactTextString(m) }
 func (*Msg) ProtoMessage()    {}
 func (*Msg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e9ef1a6541f9f9e7, []int{1}
+	return fileDescriptor_e9ef1a6541f9f9e7, []int{2}
 }
 func (m *Msg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -266,20 +324,6 @@ func (m *Msg) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Msg proto.InternalMessageInfo
 
-func (m *Msg) GetRouteGroup() string {
-	if m != nil {
-		return m.RouteGroup
-	}
-	return ""
-}
-
-func (m *Msg) GetRouteId() int32 {
-	if m != nil {
-		return m.RouteId
-	}
-	return 0
-}
-
 func (m *Msg) GetRequestId() string {
 	if m != nil {
 		return m.RequestId
@@ -298,6 +342,7 @@ func init() {
 	proto.RegisterEnum("packet.Type", Type_name, Type_value)
 	proto.RegisterEnum("packet.AuthMode", AuthMode_name, AuthMode_value)
 	proto.RegisterEnum("packet.RouteMode", RouteMode_name, RouteMode_value)
+	proto.RegisterType((*Route)(nil), "packet.Route")
 	proto.RegisterType((*Packet)(nil), "packet.Packet")
 	proto.RegisterType((*Msg)(nil), "packet.Msg")
 }
@@ -305,34 +350,70 @@ func init() {
 func init() { proto.RegisterFile("packet.proto", fileDescriptor_e9ef1a6541f9f9e7) }
 
 var fileDescriptor_e9ef1a6541f9f9e7 = []byte{
-	// 422 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x3c, 0x52, 0xc1, 0x6e, 0xd3, 0x40,
-	0x14, 0xcc, 0xc6, 0x6e, 0x62, 0xbf, 0x44, 0x68, 0xd9, 0x03, 0x32, 0x87, 0x1a, 0x53, 0x2e, 0x51,
-	0x24, 0x2a, 0x48, 0xbf, 0x20, 0x45, 0x02, 0x2a, 0x94, 0x2a, 0x32, 0x70, 0xe1, 0x12, 0x6d, 0x76,
-	0x57, 0x4e, 0x95, 0xda, 0xbb, 0xac, 0xd7, 0xaa, 0xf2, 0x17, 0xfd, 0x2c, 0x8e, 0x3d, 0x72, 0x44,
-	0xc9, 0x8f, 0xa0, 0x7d, 0xb6, 0x7b, 0x9b, 0x99, 0xf7, 0x34, 0xf3, 0x76, 0xb4, 0x30, 0x35, 0x5c,
-	0xec, 0x95, 0xbb, 0x34, 0x56, 0x3b, 0xcd, 0x46, 0x2d, 0xbb, 0x78, 0x1c, 0xc2, 0x68, 0x8d, 0x90,
-	0x65, 0x10, 0xba, 0x83, 0x51, 0x09, 0xc9, 0xc8, 0xec, 0xc5, 0x62, 0x7a, 0xd9, 0xed, 0xff, 0x38,
-	0x18, 0x95, 0xe3, 0x84, 0x31, 0x08, 0x1b, 0x79, 0x27, 0x93, 0x61, 0x46, 0x66, 0x71, 0x8e, 0x98,
-	0xbd, 0x86, 0x88, 0x1b, 0xb3, 0xa9, 0x78, 0xa9, 0x92, 0x00, 0xf5, 0x31, 0x37, 0xe6, 0x96, 0x97,
-	0x8a, 0xbd, 0x87, 0x98, 0x37, 0x6e, 0xb7, 0x29, 0xb5, 0x54, 0xc9, 0x02, 0x5d, 0x69, 0xef, 0xba,
-	0x6c, 0xdc, 0x6e, 0xa5, 0xa5, 0xca, 0x23, 0xde, 0x21, 0xf6, 0x0a, 0x46, 0xb5, 0x12, 0x56, 0xb9,
-	0xe4, 0x0a, 0x7d, 0x3a, 0xc6, 0xce, 0x01, 0xee, 0xb5, 0xe0, 0xf7, 0x1b, 0x2e, 0xa5, 0x4d, 0xd6,
-	0x38, 0x8b, 0x51, 0x59, 0x4a, 0x69, 0xd9, 0x07, 0x00, 0xab, 0x1b, 0xa7, 0xda, 0x98, 0x2d, 0xc6,
-	0xbc, 0xec, 0x63, 0x72, 0x3f, 0xc1, 0x9c, 0xd8, 0xf6, 0x90, 0x9d, 0x43, 0x50, 0xd6, 0x45, 0x22,
-	0x32, 0x32, 0x9b, 0x2c, 0x26, 0xfd, 0xea, 0xaa, 0x2e, 0x72, 0xaf, 0x5f, 0x38, 0x08, 0x56, 0x75,
-	0xc1, 0xde, 0xc0, 0xa4, 0xf5, 0x2d, 0xac, 0x6e, 0x0c, 0xb6, 0x12, 0xe7, 0x6d, 0xd4, 0x17, 0xaf,
-	0xf8, 0x97, 0xb7, 0x0b, 0x5d, 0x23, 0x67, 0xf9, 0x18, 0xf9, 0x8d, 0xf4, 0x27, 0x5b, 0xf5, 0xbb,
-	0x51, 0xb5, 0xf3, 0xc3, 0x6d, 0x7b, 0x72, 0xa7, 0xdc, 0x48, 0xdf, 0xe3, 0x56, 0xcb, 0x03, 0x5e,
-	0x30, 0xcd, 0x11, 0xcf, 0xbf, 0x41, 0xe8, 0x9b, 0x66, 0x13, 0x18, 0xff, 0xac, 0xf6, 0x95, 0x7e,
-	0xa8, 0xe8, 0xc0, 0x93, 0x4f, 0xba, 0xaa, 0x94, 0x70, 0x94, 0xf4, 0x64, 0x29, 0xf6, 0x74, 0xc8,
-	0x22, 0x08, 0xd7, 0x77, 0x55, 0x41, 0x03, 0x44, 0xba, 0x2a, 0x68, 0xe8, 0xd1, 0xb5, 0x96, 0x07,
-	0x2a, 0xe6, 0x6f, 0x21, 0xea, 0x0b, 0x66, 0x53, 0x88, 0xbe, 0x96, 0x5c, 0x7c, 0xdf, 0xf1, 0x8f,
-	0x74, 0xc0, 0xc6, 0x10, 0xdc, 0x6a, 0x47, 0xc5, 0xfc, 0x1d, 0xc4, 0xcf, 0xe5, 0xb0, 0x18, 0xce,
-	0x90, 0xb4, 0x91, 0x9f, 0xb5, 0x7d, 0xe0, 0x56, 0x52, 0x72, 0x9d, 0xfd, 0x39, 0xa6, 0xe4, 0xe9,
-	0x98, 0x92, 0x7f, 0xc7, 0x94, 0x3c, 0x9e, 0xd2, 0xc1, 0xd3, 0x29, 0x1d, 0xfc, 0x3d, 0xa5, 0x83,
-	0x5f, 0xdd, 0xff, 0xd9, 0x8e, 0xf0, 0x3b, 0x5d, 0xfd, 0x0f, 0x00, 0x00, 0xff, 0xff, 0x5b, 0xc0,
-	0xaf, 0x6b, 0x5e, 0x02, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x52, 0xcd, 0x6a, 0xdb, 0x40,
+	0x18, 0xd4, 0x9f, 0x1d, 0xe9, 0xb3, 0x1b, 0xb6, 0x4b, 0x29, 0xea, 0x21, 0x42, 0x75, 0xa1, 0x18,
+	0x43, 0x42, 0xeb, 0x5c, 0x7a, 0x75, 0x0a, 0xa1, 0xa5, 0x38, 0x04, 0xb5, 0xbd, 0xa4, 0x07, 0xb3,
+	0xde, 0x5d, 0x64, 0xe3, 0x48, 0xbb, 0x5d, 0xad, 0x08, 0x7e, 0x8b, 0xbe, 0x4c, 0xdf, 0xa1, 0xc7,
+	0x1c, 0x7b, 0x2c, 0xf6, 0x8b, 0x14, 0x7d, 0x92, 0x0a, 0xbd, 0xcd, 0x7c, 0xdf, 0xec, 0xcc, 0xee,
+	0xb0, 0x30, 0xd6, 0x8c, 0xef, 0xa4, 0xbd, 0xd0, 0x46, 0x59, 0x45, 0x87, 0x2d, 0x9b, 0x9c, 0xc3,
+	0x20, 0x53, 0xb5, 0x95, 0xf4, 0x19, 0x0c, 0x72, 0xa3, 0x6a, 0x1d, 0xbb, 0xa9, 0x3b, 0x8d, 0xb2,
+	0x96, 0xd0, 0x53, 0xf0, 0xb6, 0x22, 0xf6, 0x52, 0x77, 0x3a, 0xc8, 0xbc, 0xad, 0x98, 0xfc, 0xf4,
+	0x60, 0x78, 0x8b, 0x27, 0x69, 0x0a, 0x81, 0xdd, 0x6b, 0x89, 0xfa, 0xd3, 0xf9, 0xf8, 0xa2, 0xb3,
+	0xff, 0xb2, 0xd7, 0x32, 0xc3, 0x0d, 0xa5, 0x10, 0xd4, 0xa2, 0x3b, 0x1e, 0x65, 0x88, 0xe9, 0x0b,
+	0x08, 0x99, 0xd6, 0xab, 0x92, 0x15, 0x32, 0xf6, 0x71, 0x7e, 0xc2, 0xb4, 0xbe, 0x61, 0x85, 0xa4,
+	0xe7, 0x10, 0xb1, 0xda, 0x6e, 0x56, 0x85, 0x12, 0x32, 0x9e, 0xa3, 0x2b, 0xe9, 0x5d, 0x17, 0xb5,
+	0xdd, 0x2c, 0x95, 0x90, 0x59, 0xc8, 0x3a, 0x44, 0x9f, 0xc3, 0xb0, 0x92, 0xdc, 0x48, 0x1b, 0x5f,
+	0xa2, 0x4f, 0xc7, 0xe8, 0x19, 0xc0, 0xbd, 0xe2, 0xec, 0x7e, 0xc5, 0x84, 0x30, 0xf1, 0x35, 0xee,
+	0x22, 0x9c, 0x2c, 0x84, 0x30, 0xf4, 0x0d, 0x80, 0x69, 0x1e, 0xdc, 0xc6, 0xdc, 0x61, 0xcc, 0xd3,
+	0x3e, 0x06, 0xab, 0xc0, 0x9c, 0xc8, 0xf4, 0x90, 0xbe, 0x82, 0x01, 0x92, 0xf8, 0x5b, 0xea, 0x4e,
+	0x47, 0xf3, 0x27, 0xff, 0x89, 0xb3, 0x76, 0x47, 0xcf, 0xc0, 0x2f, 0xaa, 0x3c, 0xe6, 0x28, 0x19,
+	0xf5, 0x92, 0x65, 0x95, 0x67, 0xcd, 0x7c, 0xf2, 0x0e, 0xfc, 0x65, 0x95, 0x37, 0x77, 0x33, 0xf2,
+	0x7b, 0x2d, 0x2b, 0xbb, 0xda, 0x8a, 0x78, 0xdd, 0xde, 0xad, 0x9b, 0x7c, 0x14, 0x4d, 0x61, 0x6b,
+	0x25, 0xf6, 0xe8, 0x32, 0xce, 0x10, 0xcf, 0x3e, 0x41, 0xd0, 0x54, 0x4a, 0x47, 0x70, 0xf2, 0xb5,
+	0xdc, 0x95, 0xea, 0xa1, 0x24, 0x4e, 0x43, 0xde, 0xab, 0xb2, 0x94, 0xdc, 0x12, 0xb7, 0x27, 0x0b,
+	0xbe, 0x23, 0x1e, 0x0d, 0x21, 0xb8, 0xdd, 0x96, 0x39, 0xf1, 0x11, 0xa9, 0x32, 0x27, 0x41, 0x83,
+	0xae, 0x94, 0xd8, 0x13, 0x3e, 0x7b, 0x09, 0x61, 0xdf, 0x24, 0x1d, 0x43, 0xf8, 0xa1, 0x60, 0xfc,
+	0xf3, 0x86, 0xbd, 0x25, 0x0e, 0x3d, 0x01, 0xff, 0x46, 0x59, 0xc2, 0x67, 0xaf, 0x21, 0xfa, 0xd7,
+	0x42, 0xa3, 0x69, 0x49, 0x95, 0xb7, 0xa9, 0xd7, 0xca, 0x3c, 0x30, 0x23, 0x88, 0x7b, 0x95, 0xfe,
+	0x3a, 0x24, 0xee, 0xe3, 0x21, 0x71, 0xff, 0x1c, 0x12, 0xf7, 0xc7, 0x31, 0x71, 0x1e, 0x8f, 0x89,
+	0xf3, 0xfb, 0x98, 0x38, 0x77, 0xdd, 0xd7, 0x5a, 0x0f, 0xf1, 0xa7, 0x5d, 0xfe, 0x0d, 0x00, 0x00,
+	0xff, 0xff, 0x09, 0x7e, 0x4e, 0x6d, 0x79, 0x02, 0x00, 0x00,
+}
+
+func (m *Route) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Route) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Route) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintPacket(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Group) > 0 {
+		i -= len(m.Group)
+		copy(dAtA[i:], m.Group)
+		i = encodeVarintPacket(dAtA, i, uint64(len(m.Group)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Packet) Marshal() (dAtA []byte, err error) {
@@ -369,21 +450,35 @@ func (m *Packet) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x9a
 	}
+	if m.Route != nil {
+		{
+			size, err := m.Route.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5
+		i--
+		dAtA[i] = 0xda
+	}
 	if m.RouteMode != 0 {
 		i = encodeVarintPacket(dAtA, i, uint64(m.RouteMode))
 		i--
-		dAtA[i] = 0x6
+		dAtA[i] = 0x5
 		i--
-		dAtA[i] = 0x90
+		dAtA[i] = 0xd0
 	}
 	if len(m.LocalAddr) > 0 {
 		i -= len(m.LocalAddr)
 		copy(dAtA[i:], m.LocalAddr)
 		i = encodeVarintPacket(dAtA, i, uint64(len(m.LocalAddr)))
 		i--
-		dAtA[i] = 0x5
+		dAtA[i] = 0x4
 		i--
-		dAtA[i] = 0x82
+		dAtA[i] = 0xb2
 	}
 	if len(m.Secret) > 0 {
 		i -= len(m.Secret)
@@ -461,18 +556,6 @@ func (m *Msg) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x92
 	}
-	if m.RouteId != 0 {
-		i = encodeVarintPacket(dAtA, i, uint64(m.RouteId))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.RouteGroup) > 0 {
-		i -= len(m.RouteGroup)
-		copy(dAtA[i:], m.RouteGroup)
-		i = encodeVarintPacket(dAtA, i, uint64(len(m.RouteGroup)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -487,6 +570,22 @@ func encodeVarintPacket(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *Route) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Group)
+	if l > 0 {
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	if m.Id != 0 {
+		n += 1 + sovPacket(uint64(m.Id))
+	}
+	return n
+}
+
 func (m *Packet) Size() (n int) {
 	if m == nil {
 		return 0
@@ -518,6 +617,10 @@ func (m *Packet) Size() (n int) {
 	if m.RouteMode != 0 {
 		n += 2 + sovPacket(uint64(m.RouteMode))
 	}
+	if m.Route != nil {
+		l = m.Route.Size()
+		n += 2 + l + sovPacket(uint64(l))
+	}
 	if m.Msg != nil {
 		l = m.Msg.Size()
 		n += 2 + l + sovPacket(uint64(l))
@@ -531,13 +634,6 @@ func (m *Msg) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.RouteGroup)
-	if l > 0 {
-		n += 1 + l + sovPacket(uint64(l))
-	}
-	if m.RouteId != 0 {
-		n += 1 + sovPacket(uint64(m.RouteId))
-	}
 	l = len(m.RequestId)
 	if l > 0 {
 		n += 2 + l + sovPacket(uint64(l))
@@ -554,6 +650,107 @@ func sovPacket(x uint64) (n int) {
 }
 func sozPacket(x uint64) (n int) {
 	return sovPacket(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *Route) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowPacket
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Route: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Route: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Group = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipPacket(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *Packet) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -718,7 +915,7 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 			}
 			m.Secret = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 80:
+		case 70:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LocalAddr", wireType)
 			}
@@ -750,7 +947,7 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 			}
 			m.LocalAddr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 98:
+		case 90:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RouteMode", wireType)
 			}
@@ -769,6 +966,42 @@ func (m *Packet) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 91:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Route", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Route == nil {
+				m.Route = &Route{}
+			}
+			if err := m.Route.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 99:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
@@ -855,57 +1088,6 @@ func (m *Msg) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: Msg: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RouteGroup", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacket
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacket
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RouteGroup = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RouteId", wireType)
-			}
-			m.RouteId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacket
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.RouteId |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		case 98:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequestId", wireType)

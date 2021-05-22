@@ -28,8 +28,13 @@ enum AuthMode {
 }
 
 enum RouteMode {
-    Route = 0;
+    RouteMsg = 0;
     Forward = 1;
+}
+
+message Route {
+    string group = 1;
+    int32 id = 2;
 }
 
 // Packet packet message structure.
@@ -50,18 +55,17 @@ message Packet {
     /** Auth. End**/
 
     /** Other. Begin**/
-    string local_addr = 80;
+    string local_addr = 70;
     /** Other. ned**/
 
     /** Route msg. Begin**/
-    RouteMode route_mode = 98;
+    RouteMode route_mode = 90;
+    Route route = 91;
     Msg msg = 99;
     /** Route msg. End**/
 }
 
 message Msg {
-    string route_group = 1;
-    int32 route_id = 2;
     string request_id = 98;
     bytes body = 99;
 }
