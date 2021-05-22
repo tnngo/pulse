@@ -29,8 +29,8 @@ enum AuthMode {
 
 enum RouteMode {
     Normal = 0;
-    DefaultRoute = 1;
-    SelfProcRoute = 2;
+    Default = 1;
+    SelfProc = 2;
 }
 
 message Route {
