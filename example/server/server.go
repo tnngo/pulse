@@ -5,14 +5,17 @@ import (
 
 	"github.com/tnngo/log"
 	"github.com/tnngo/pulse"
+	"github.com/tnngo/pulse/packet"
 	"github.com/tnngo/pulse/route"
 	"go.uber.org/zap"
 )
 
-func connect(ctx context.Context, body []byte) ([]byte, error) {
+func connect(ctx context.Context, msg *packet.Msg) (*packet.Msg, error) {
 	conn := pulse.CtxConn(ctx)
 	log.L().Debug("device online", zap.String("udid", conn.UDID()))
-	return nil, nil
+	ack := new(packet.Msg)
+	ack.Body = []byte("i am server")
+	return ack, nil
 }
 
 func close(ctx context.Context) {
@@ -20,8 +23,8 @@ func close(ctx context.Context) {
 	log.L().Debug("device offline", zap.String("udid", conn.UDID()))
 }
 
-func routeTest(ctx context.Context, body []byte) error {
-	log.L().Debug(string(body))
+func routeTest(ctx context.Context, msg *packet.Msg) error {
+	log.L().Debug(string(msg.Body))
 	return nil
 }
 
