@@ -282,13 +282,13 @@ func (c *Client) Write(msg *packet.Msg) error {
 }
 
 func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", packet.RouteMode_Routes, msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_Default, msg)
 }
 
 func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
 	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
 }
 
-func (c *Client) WriteForward(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_Forward, msg)
+func (c *Client) WriteSelfProc(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, packet.RouteMode_SelfProc, msg)
 }
