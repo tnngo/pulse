@@ -27,8 +27,8 @@ enum AuthMode {
     Not = 99;
 }
 
-enum MsgMode {
-    RouteMsg = 0;
+enum RouteMode {
+    Normal = 0;
     Forward = 1;
 }
 
@@ -59,7 +59,7 @@ message Packet {
     /** Other. ned**/
 
     /** Route msg. Begin**/
-    MsgMode msg_mode = 90;
+    RouteMode route_mode = 90;
     Route route = 91;
     Msg msg = 99;
     /** Route msg. End**/
