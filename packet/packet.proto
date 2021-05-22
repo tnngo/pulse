@@ -48,7 +48,7 @@ message Packet {
     Type type = 1;
     Header header = 2;
     Route route = 3;
-    string request_id = 4;
-    string local_addr = 5;
+    string request_id = 97;
+    string local_addr = 98;
     bytes body = 99;
 }
