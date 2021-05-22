@@ -24,12 +24,13 @@ enum AuthMode {
     // PULSE default encryption method.
     // Base64(Hmac+Sha1).
     HmacSha1 = 0;
-    Not = 99;
+    NotSafe = 99;
 }
 
 enum RouteMode {
-    Normal = 0;
-    Forward = 1;
+    Not = 0;
+    Normal = 1;
+    Forward = 2;
 }
 
 message Route {
