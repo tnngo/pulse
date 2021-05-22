@@ -29,16 +29,16 @@ var routeMap = make(map[string]map[int32]RouteFunc)
 
 // ID default route group name is equal to empty.
 func ID(id int32, rf RouteFunc) {
-	if _, ok := routeMap[""][id]; ok {
+	if _, ok := routeMap["pulse"][id]; ok {
 		log.L().Sugar().Errorf("id already exists, id=%d", id)
 		return
 	}
 
-	if routeMap[""] == nil {
-		routeMap[""] = make(map[int32]RouteFunc)
+	if routeMap["pulse"] == nil {
+		routeMap["pulse"] = make(map[int32]RouteFunc)
 	}
 
-	routeMap[""][id] = rf
+	routeMap["pulse"][id] = rf
 }
 
 func RouteGroup(group string) (*route, error) {
@@ -68,7 +68,7 @@ func (rg *route) ID(id int32, rf RouteFunc) error {
 }
 
 func GetRoute(id int32) (RouteFunc, error) {
-	if v, ok := routeMap[""][id]; !ok {
+	if v, ok := routeMap["pulse"][id]; !ok {
 		return nil, fmt.Errorf("route %d does not exist", id)
 	} else {
 		return v, nil
