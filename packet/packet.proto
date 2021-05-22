@@ -21,25 +21,34 @@ enum Type {
 
 // AuthMode Type = Connect
 enum AuthMode {
-    Default = 0;
-    CustomSecret = 1;
-    FullyCustom = 2;
+    // PULSE default encryption method.
+    // Base64(Hmac+Sha1)
+    HmacSha1 = 0;
+    Not = 99;
+}
+
+message Header {
+    // Udid Unique identification of device terminal.
+    string udid = 1;
+    // AppName Sometimes the same type of device will have different business scenarios, 
+    // so the applications in the device will be named differently.
+    string app_name = 2;
+    AuthMode auth_mode = 3;
+    string secret = 4;
+}
+
+message Route {
+    string group = 1;
+    int32 id = 2;
 }
 
 // Packet packet message structure。
 message Packet {
     // Type packet type
     Type type = 1;
-    // udid Unique identification of device terminal.
-    string udid = 2;
-    // just a simple security authorization field,
-    // if you want to implement it yourself,
-    // you can give up this field, and encapsulate it in the Body when the type is Connect.
-    AuthMode auth_mode = 3;
-    string secret = 4;
-    string route_group = 5;
-    int32 route_id = 6;
-    string request_id = 7;
-    string local_addr = 8;
+    Header header = 2;
+    Route route = 3;
+    string request_id = 4;
+    string local_addr = 5;
     bytes body = 99;
 }
