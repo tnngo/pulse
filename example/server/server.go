@@ -29,6 +29,10 @@ func routeTest(ctx context.Context, msg *packet.Msg) error {
 }
 
 func forward(ctx context.Context, route *packet.Route, msg *packet.Msg) {
+	log.L().Debug(string(msg.Body), zap.Reflect("route", route))
+}
+
+func normal(ctx context.Context, msg *packet.Msg) {
 	log.L().Debug(string(msg.Body))
 }
 
@@ -38,6 +42,7 @@ func main() {
 	pl := pulse.New("tcp", 8080)
 	pl.CallConnect(connect)
 	pl.CallClose(close)
-	pl.CallForward(forward)
+	pl.CallSelfProc(forward)
+	pl.CallNormal(normal)
 	pl.Listen()
 }
