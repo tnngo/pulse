@@ -26,8 +26,10 @@ const (
 )
 
 type (
-	callConnectFunc func(context.Context, []byte) ([]byte, error)
+	callConnectFunc func(context.Context, *packet.Msg) (*packet.Msg, error)
 	callCloseFunc   func(context.Context)
+
+	forwardFunc func(context.Context, *packet.Msg)
 )
 
 type Pulse struct {
@@ -42,6 +44,7 @@ type Pulse struct {
 
 	callConnectFunc callConnectFunc
 	callCloseFunc   callCloseFunc
+	forwardFunc     forwardFunc
 }
 
 // network: tcp、udp
@@ -181,34 +184,35 @@ func (pl *Pulse) handle(netconn net.Conn) {
 					log.L().Error(err.Error())
 				}
 
-				if len(p.RequestId) == 0 {
-					ctx = pl.setCtxReqId(ctx, uuid.New().String())
-				} else {
-					ctx = pl.setCtxReqId(ctx, p.RequestId)
-				}
+				// if len(p.RequestId) == 0 {
+				// 	ctx = pl.setCtxReqId(ctx, uuid.New().String())
+				// } else {
+				// 	ctx = pl.setCtxReqId(ctx, p.RequestId)
+				// }
 
 				if p.Type == packet.Type_Connect {
 					// type connect,
 					// connect type is handled separately.
 					ctx = pl.connect(ctx, netconn, p)
 
-					if p.AuthMode != packet.AuthMode_FullyCustom {
+					if p.AuthMode == packet.AuthMode_HmacSha1 {
 						ctx = pl.setSecret(ctx, p.Secret)
 					}
 
+					// server to client.
 					pAck := new(packet.Packet)
 					pAck.Type = packet.Type_ConnAck
 					pAck.Udid = p.Udid
 					if pl.callConnectFunc != nil {
-						repBody, err := pl.callConnectFunc(ctx, p.Body)
+						repMsg, err := pl.callConnectFunc(ctx, p.Msg)
 						if err != nil {
 							netconn.Close()
 							return
 						}
-						if repBody != nil {
+						if repMsg != nil {
 							// type connack,
 							// connack type is handled separately.
-							pAck.Body = repBody
+							pAck.Msg = repMsg
 						}
 
 					}
@@ -279,23 +283,37 @@ func (pl *Pulse) pong(netconn net.Conn) {
 }
 
 func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
-	if len(p.RouteGroup) == 0 {
-		rf, err := route.GetRoute(p.RouteId)
+	if p.RouteMode == packet.RouteMode_Forward {
+		if pl.forwardFunc == nil {
+			log.L().Warn("FrowardFunc is nil")
+		} else {
+			pl.forwardFunc(ctx, p.Msg)
+		}
+		return
+	}
+
+	if p.Msg == nil {
+		log.L().Warn("packet.Msg is nil")
+		return
+	}
+
+	if p.Msg.RouteGroup == "pulse" {
+		rf, err := route.GetRoute(p.Msg.RouteId)
 		if err != nil {
 			log.L().Error(err.Error())
 			return
 		}
-		rf(ctx, p.Body)
+		rf(ctx, p.Msg)
 		return
 	}
 
-	f, err := route.GetRouteGroup(p.RouteId, p.RouteGroup)
+	f, err := route.GetRouteGroup(p.Msg.RouteId, p.Msg.RouteGroup)
 	if err != nil {
 		log.L().Error(err.Error())
 		return
 	}
 
-	f(ctx, p.Body)
+	f(ctx, p.Msg)
 }
 
 // set connection's context.
