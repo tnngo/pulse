@@ -27,7 +27,7 @@ func main() {
 	for {
 		msg := new(packet.Msg)
 		msg.RequestId = uuid.New().String()
-		msg.Body = []byte("routes")
+		msg.Body = []byte("default")
 		err := c.WriteRoute(1, msg)
 		if err != nil {
 			log.L().Error(err.Error())
