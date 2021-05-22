@@ -278,11 +278,11 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 }
 
 func (c *Client) Write(msg *packet.Msg) error {
-	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
+	return c.writeRoute(0, "", packet.RouteMode_Normal, msg)
 }
 
 func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_Routes, msg)
 }
 
 func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {

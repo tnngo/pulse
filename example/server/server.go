@@ -28,11 +28,16 @@ func routeTest(ctx context.Context, msg *packet.Msg) error {
 	return nil
 }
 
+func forward(ctx context.Context, route *packet.Route, msg *packet.Msg) {
+	log.L().Debug(string(msg.Body))
+}
+
 func main() {
 	route.ID(1, routeTest)
 
 	pl := pulse.New("tcp", 8080)
 	pl.CallConnect(connect)
 	pl.CallClose(close)
+	pl.CallForward(forward)
 	pl.Listen()
 }
