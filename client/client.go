@@ -233,7 +233,7 @@ func (c *Client) setConn(netconn net.Conn) {
 	c.netconn = netconn
 }
 
-func (c *Client) writeMsg(msg *packet.Msg) error {
+func (c *Client) writeRoute(id int32, group string, msg *packet.Msg) error {
 	if c.getConn() == nil {
 		return errors.New("No connection available, the connection object is nil")
 	}
@@ -273,6 +273,10 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }
 
-func (c *Client) WriteMsg(msg *packet.Msg) error {
-	return c.writeMsg(msg)
+func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
+	return c.writeRoute(id, "pulse", msg)
+}
+
+func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, msg)
 }
