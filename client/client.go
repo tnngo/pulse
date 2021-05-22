@@ -233,13 +233,14 @@ func (c *Client) setConn(netconn net.Conn) {
 	c.netconn = netconn
 }
 
-func (c *Client) writeRoute(id int32, group string, msg *packet.Msg) error {
+func (c *Client) writeRoute(id int32, group string, routeMode packet.RouteMode, msg *packet.Msg) error {
 	if c.getConn() == nil {
 		return errors.New("No connection available, the connection object is nil")
 	}
 
 	p := new(packet.Packet)
 	p.Type = packet.Type_Body
+	p.RouteMode = routeMode
 	p.Route = new(packet.Route)
 	p.Route.Id = id
 	p.Route.Group = group
@@ -276,10 +277,18 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }
 
+func (c *Client) Write(msg *packet.Msg) error {
+	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
+}
+
 func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
 }
 
 func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, msg)
+	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
+}
+
+func (c *Client) WriteForward(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, packet.RouteMode_Forward, msg)
 }
