@@ -240,6 +240,9 @@ func (c *Client) writeRoute(id int32, group string, msg *packet.Msg) error {
 
 	p := new(packet.Packet)
 	p.Type = packet.Type_Body
+	p.Route = new(packet.Route)
+	p.Route.Id = id
+	p.Route.Group = group
 	p.Msg = msg
 
 	b, err := pulse.Encode(p)
