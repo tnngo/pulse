@@ -21,9 +21,11 @@ import (
 )
 
 type (
-	callConnectFunc func() *packet.Msg
-	callConnAckFunc func(context.Context, *packet.Msg)
-	callCloseFunc   func(context.Context)
+	callConnectFunc      func() *packet.Msg
+	callConnAckFunc      func(context.Context, *packet.Msg)
+	callCloseFunc        func(context.Context)
+	callNotRouteFunc     func(*packet.Msg)
+	callDynamicRouteFunc func(*packet.Route, *packet.Msg)
 )
 
 type Client struct {
@@ -37,8 +39,10 @@ type Client struct {
 	secret   string
 	authMode packet.AuthMode
 
-	callConnectFunc callConnectFunc
-	callConnAckFunc callConnAckFunc
+	callConnectFunc      callConnectFunc
+	callConnAckFunc      callConnAckFunc
+	callNotRouteFunc     callNotRouteFunc
+	callDynamicRouteFunc callDynamicRouteFunc
 
 	rwmutex sync.RWMutex
 }
@@ -192,6 +196,19 @@ func (c *Client) parse(p *packet.Packet) {
 }
 
 func (c *Client) body(p *packet.Packet) {
+	if p.RouteMode == packet.RouteMode_Not {
+		if c.callNotRouteFunc != nil {
+			c.callNotRouteFunc(p.Msg)
+		}
+		return
+	}
+	if p.RouteMode == packet.RouteMode_Dynamic {
+		if c.callDynamicRouteFunc != nil {
+			c.callDynamicRouteFunc(p.Route, p.Msg)
+		}
+		return
+	}
+
 	if p.Msg == nil {
 		log.L().Warn("packet.Msg is nil")
 		return
