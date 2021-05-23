@@ -35,6 +35,7 @@ func (c *Conn) writeRoute(id int32, group string, routeMode packet.RouteMode, ms
 	p := new(packet.Packet)
 	p.Udid = c.udid
 	p.Type = packet.Type_Body
+	p.RouteMode = routeMode
 	p.Msg = msg
 
 	b, err := Encode(p)
