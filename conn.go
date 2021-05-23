@@ -28,7 +28,7 @@ func newConn(netconn net.Conn) *Conn {
 	}
 }
 
-func (c *Conn) writeMsg(msg *packet.Msg) error {
+func (c *Conn) writeRoute(msg *packet.Msg) error {
 	if msg == nil {
 		return errors.New("msg is nil")
 	}
@@ -70,6 +70,6 @@ func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
 }
 
-func (c *Conn) WriteMsg(msg *packet.Msg) error {
-	return c.writeMsg(msg)
+func (c *Conn) WriteRoute(msg *packet.Msg) error {
+	return c.writeRoute(msg)
 }
