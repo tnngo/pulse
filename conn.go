@@ -28,7 +28,7 @@ func newConn(netconn net.Conn) *Conn {
 	}
 }
 
-func (c *Conn) writeRoute(msg *packet.Msg) error {
+func (c *Conn) writeRoute(id int32, group string, routeMode packet.RouteMode, msg *packet.Msg) error {
 	if msg == nil {
 		return errors.New("msg is nil")
 	}
@@ -70,6 +70,22 @@ func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
 }
 
-func (c *Conn) WriteRoute(msg *packet.Msg) error {
-	return c.writeRoute(msg)
+func (c *Conn) Write(msg *packet.Msg) error {
+	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
+}
+
+func (c *Conn) WriteRoute(id int32, msg *packet.Msg) error {
+	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
+}
+
+func (c *Conn) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
+}
+
+func (c *Conn) WriteDynamic(id int32, msg *packet.Msg) error {
+	return c.writeRoute(id, "", packet.RouteMode_Dynamic, msg)
+}
+
+func (c *Conn) WriteDynamicGroup(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, packet.RouteMode_Dynamic, msg)
 }

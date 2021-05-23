@@ -44,7 +44,7 @@ func main() {
 		msg2 := new(packet.Msg)
 		msg2.RequestId = uuid.New().String()
 		msg2.Body = []byte("dynamic")
-		err = c.WriteDynamic(1, "group", msg2)
+		err = c.WriteDynamic(1, msg2)
 		if err != nil {
 			log.L().Error(err.Error())
 		}

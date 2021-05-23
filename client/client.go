@@ -291,6 +291,10 @@ func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error 
 	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
 }
 
-func (c *Client) WriteDynamic(id int32, group string, msg *packet.Msg) error {
+func (c *Client) WriteDynamic(id int32, msg *packet.Msg) error {
+	return c.writeRoute(id, "pulse", packet.RouteMode_Dynamic, msg)
+}
+
+func (c *Client) WriteDynamicGroup(id int32, group string, msg *packet.Msg) error {
 	return c.writeRoute(id, group, packet.RouteMode_Dynamic, msg)
 }
