@@ -277,18 +277,20 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 	c.callConnAckFunc = f
 }
 
+// Write no routing mode.
+// All data is gathered in the CallNotRoute(...) method in the server.
 func (c *Client) Write(msg *packet.Msg) error {
-	return c.writeRoute(0, "", packet.RouteMode_Normal, msg)
+	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
 }
 
 func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", packet.RouteMode_Default, msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
 }
 
 func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
 	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
 }
 
-func (c *Client) WriteSelfProc(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_SelfProc, msg)
+func (c *Client) WriteDynamic(id int32, group string, msg *packet.Msg) error {
+	return c.writeRoute(id, group, packet.RouteMode_Dynamic, msg)
 }

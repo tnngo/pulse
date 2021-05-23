@@ -26,10 +26,10 @@ const (
 )
 
 type (
-	callConnectFunc func(context.Context, *packet.Msg) (*packet.Msg, error)
-	callCloseFunc   func(context.Context)
-	callForwardFunc func(context.Context, *packet.Route, *packet.Msg)
-	callNormalFunc  func(context.Context, *packet.Msg)
+	callConnectFunc      func(context.Context, *packet.Msg) (*packet.Msg, error)
+	callCloseFunc        func(context.Context)
+	callNotRouteFunc     func(context.Context, *packet.Msg)
+	callDynamicRouteFunc func(context.Context, *packet.Route, *packet.Msg)
 )
 
 type Pulse struct {
@@ -42,10 +42,10 @@ type Pulse struct {
 	// packet object pool.
 	packetPool *sync.Pool
 
-	callConnectFunc  callConnectFunc
-	callCloseFunc    callCloseFunc
-	callSelfProcFunc callForwardFunc
-	callNormalFunc   callNormalFunc
+	callConnectFunc      callConnectFunc
+	callCloseFunc        callCloseFunc
+	callNotRouteFunc     callNotRouteFunc
+	callDynamicRouteFunc callDynamicRouteFunc
 }
 
 // network: tcp、udp
@@ -284,15 +284,15 @@ func (pl *Pulse) pong(netconn net.Conn) {
 }
 
 func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
-	if p.RouteMode == packet.RouteMode_Normal {
-		if pl.callNormalFunc != nil {
-			pl.callNormalFunc(ctx, p.Msg)
+	if p.RouteMode == packet.RouteMode_Not {
+		if pl.callNotRouteFunc != nil {
+			pl.callNotRouteFunc(ctx, p.Msg)
 		}
 		return
 	}
-	if p.RouteMode == packet.RouteMode_SelfProc {
-		if pl.callSelfProcFunc != nil {
-			pl.callSelfProcFunc(ctx, p.Route, p.Msg)
+	if p.RouteMode == packet.RouteMode_Dynamic {
+		if pl.callDynamicRouteFunc != nil {
+			pl.callDynamicRouteFunc(ctx, p.Route, p.Msg)
 		}
 		return
 	}
@@ -347,12 +347,12 @@ func (pl *Pulse) CallClose(f callCloseFunc) {
 	pl.callCloseFunc = f
 }
 
-func (pl *Pulse) CallSelfProc(f callForwardFunc) {
-	pl.callSelfProcFunc = f
+func (pl *Pulse) CallNotRoute(f callNotRouteFunc) {
+	pl.callNotRouteFunc = f
 }
 
-func (pl *Pulse) CallNormal(f callNormalFunc) {
-	pl.callNormalFunc = f
+func (pl *Pulse) CallDynamicRoute(f callDynamicRouteFunc) {
+	pl.callDynamicRouteFunc = f
 }
 
 // Encode encapsulate protobuf.

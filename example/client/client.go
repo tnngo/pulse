@@ -27,7 +27,7 @@ func main() {
 	for {
 		msg := new(packet.Msg)
 		msg.RequestId = uuid.New().String()
-		msg.Body = []byte("default")
+		msg.Body = []byte("normal")
 		err := c.WriteRoute(1, msg)
 		if err != nil {
 			log.L().Error(err.Error())
@@ -35,7 +35,7 @@ func main() {
 
 		msg1 := new(packet.Msg)
 		msg1.RequestId = uuid.New().String()
-		msg1.Body = []byte("normal")
+		msg1.Body = []byte("not route")
 		err = c.Write(msg1)
 		if err != nil {
 			log.L().Error(err.Error())
@@ -43,14 +43,12 @@ func main() {
 
 		msg2 := new(packet.Msg)
 		msg2.RequestId = uuid.New().String()
-		msg2.Body = []byte("self-processing")
-		err = c.WriteSelfProc(1, "group", msg2)
+		msg2.Body = []byte("dynamic")
+		err = c.WriteDynamic(1, "group", msg2)
 		if err != nil {
 			log.L().Error(err.Error())
 		}
 
 		time.Sleep(10 * time.Millisecond)
 	}
-
-	//select {}
 }
