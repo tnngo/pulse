@@ -18,6 +18,7 @@ import (
 	"github.com/tnngo/pulse/ip"
 	"github.com/tnngo/pulse/packet"
 	"github.com/tnngo/pulse/route"
+	"go.uber.org/zap"
 )
 
 type (
@@ -152,7 +153,10 @@ func (c *Client) handle(netconn net.Conn) {
 				// type connack,
 				// connack type is handled separately.
 				if p.Type == packet.Type_ConnAck {
-					log.L().Info("successfully connected to the server")
+					log.L().Info("successfully connected",
+						zap.String("local_addr", netconn.LocalAddr().String()),
+						zap.String("remote_addr", netconn.RemoteAddr().String()),
+					)
 					if c.callConnAckFunc != nil {
 						c.callConnAckFunc(context.Background(), p.Msg)
 					}
