@@ -266,6 +266,13 @@ func (pl *Pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet
 func (pl *Pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
 	switch p.Type {
 	case packet.Type_Ping:
+		c := CtxConn(ctx)
+		if c == nil {
+			log.L().Warn("conn = nil")
+			c.netconn.Close()
+			return
+		}
+		log.L().Debug("ping", zap.String("udid", c.UDID()))
 		pl.pong(netconn)
 	case packet.Type_Body:
 		pl.body(ctx, p)
