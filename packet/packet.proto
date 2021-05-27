@@ -67,6 +67,8 @@ message Packet {
 }
 
 message Msg {
-    string request_id = 98;
+    string request_id = 1;
+    // The content of body can be customized, such as 1=Json, 2=Protobuf, etc.
+    int32 type = 2;
     bytes body = 99;
 }
