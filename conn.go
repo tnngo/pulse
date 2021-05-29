@@ -20,6 +20,8 @@ type Conn struct {
 	localAddr string
 	// client connection time.
 	connectTime int64
+
+	attach interface{}
 }
 
 func newConn(netconn net.Conn) *Conn {
@@ -73,6 +75,14 @@ func (c *Conn) LocalAddr() string {
 
 func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
+}
+
+func (c *Conn) Attach() interface{} {
+	return c.attach
+}
+
+func (c *Conn) SetAttach(attach interface{}) {
+	c.attach = attach
 }
 
 func (c *Conn) Write(msg *packet.Msg) error {
