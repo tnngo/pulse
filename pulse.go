@@ -267,8 +267,8 @@ func (pl *Pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) 
 	switch p.Type {
 	case packet.Type_Ping:
 		pl.pong(netconn)
-	case packet.Type_Body:
-		pl.body(ctx, p)
+	case packet.Type_RouteMsg:
+		pl.route(ctx, p)
 	}
 }
 
@@ -283,7 +283,7 @@ func (pl *Pulse) pong(netconn net.Conn) {
 	netconn.Write(b)
 }
 
-func (pl *Pulse) body(ctx context.Context, p *packet.Packet) {
+func (pl *Pulse) route(ctx context.Context, p *packet.Packet) {
 	if p.RouteMode == packet.RouteMode_Not {
 		if pl.callNotRouteFunc != nil {
 			pl.callNotRouteFunc(ctx, p.Msg)

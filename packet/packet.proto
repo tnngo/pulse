@@ -15,8 +15,8 @@ enum Type {
     // Server responds to the client heartbeat
     Pong = 4;
 
-    // Msg content.
-    Body = 99;
+    // RouteMsg route message.
+    RouteMsg = 99;
 }
 
 // AuthMode Type = Connect

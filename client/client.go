@@ -194,12 +194,12 @@ func (c *Client) parse(p *packet.Packet) {
 	switch p.Type {
 	case packet.Type_Pong:
 		break
-	case packet.Type_Body:
-		c.body(p)
+	case packet.Type_RouteMsg:
+		c.route(p)
 	}
 }
 
-func (c *Client) body(p *packet.Packet) {
+func (c *Client) route(p *packet.Packet) {
 	if p.RouteMode == packet.RouteMode_Not {
 		if c.callNotRouteFunc != nil {
 			c.callNotRouteFunc(p.Msg)
@@ -260,7 +260,7 @@ func (c *Client) writeRoute(id int32, group string, routeMode packet.RouteMode, 
 	}
 
 	p := new(packet.Packet)
-	p.Type = packet.Type_Body
+	p.Type = packet.Type_RouteMsg
 	p.RouteMode = routeMode
 	p.Route = new(packet.Route)
 	p.Route.Id = id
