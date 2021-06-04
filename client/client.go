@@ -256,7 +256,7 @@ func (c *Client) setConn(netconn net.Conn) {
 
 func (c *Client) writeRoute(id int32, group string, routeMode packet.RouteMode, msg *packet.Msg) error {
 	if c.getConn() == nil {
-		return errors.New("No connection available, the connection object is nil")
+		return errors.New("No connection available")
 	}
 
 	p := new(packet.Packet)
