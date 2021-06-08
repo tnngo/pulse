@@ -297,11 +297,6 @@ func (pl *Pulse) route(ctx context.Context, p *packet.Packet) {
 		return
 	}
 
-	if p.Msg == nil {
-		log.L().Warn("packet.Msg is nil")
-		return
-	}
-
 	if p.Route == nil {
 		log.L().Warn("packet.Route is nil")
 		return
