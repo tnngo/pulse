@@ -1,7 +1,6 @@
 package pulse
 
 import (
-	"errors"
 	"net"
 
 	"github.com/tnngo/pulse/packet"
@@ -20,8 +19,6 @@ type Conn struct {
 	localAddr string
 	// client connection time.
 	connectTime int64
-
-	attach interface{}
 }
 
 func newConn(netconn net.Conn) *Conn {
@@ -31,9 +28,6 @@ func newConn(netconn net.Conn) *Conn {
 }
 
 func (c *Conn) writeRoute(id int32, group string, routeMode packet.RouteMode, msg *packet.Msg) error {
-	if msg == nil {
-		return errors.New("msg is nil")
-	}
 	p := new(packet.Packet)
 	p.Udid = c.udid
 	p.Type = packet.Type_RouteMsg
@@ -75,14 +69,6 @@ func (c *Conn) LocalAddr() string {
 
 func (c *Conn) ConnectTime() int64 {
 	return c.connectTime
-}
-
-func (c *Conn) Attach() interface{} {
-	return c.attach
-}
-
-func (c *Conn) SetAttach(attach interface{}) {
-	c.attach = attach
 }
 
 func (c *Conn) Write(msg *packet.Msg) error {
