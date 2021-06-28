@@ -19,6 +19,11 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	// ErrNotSafeConnection the error will force the connection to be closed.
+	ErrNotSafeConnection = errors.New("not safe connection")
+)
+
 const (
 	ctx_conn   = "conn"
 	ctx_req_id = "request_id"
@@ -206,7 +211,7 @@ func (pl *Pulse) handle(netconn net.Conn) {
 					pAck.Udid = p.Udid
 					if pl.callConnectFunc != nil {
 						repMsg, err := pl.callConnectFunc(ctx, p.Msg)
-						if err != nil {
+						if err == ErrNotSafeConnection {
 							netconn.Close()
 							return
 						}
