@@ -212,6 +212,7 @@ func (pl *Pulse) handle(netconn net.Conn) {
 					if pl.callConnectFunc != nil {
 						repMsg, err := pl.callConnectFunc(ctx, p.Msg)
 						if err == ErrNotSafeConnection {
+							log.L().Warn(ErrNotSafeConnection.Error(), zap.String("remote_addr", netconn.RemoteAddr().String()), zap.String("network", netconn.RemoteAddr().Network()))
 							netconn.Close()
 							return
 						}
