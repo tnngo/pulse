@@ -279,8 +279,8 @@ func (c *Client) UDID(udid string) {
 }
 
 func (c *Client) Secret(key, value string) {
-	hsha1 := hmac.New(sha1.New, []byte(key+"."+value))
-	hsha1.Write([]byte(key + "." + value + "." + c.udid))
+	hsha1 := hmac.New(sha1.New, []byte(key))
+	hsha1.Write([]byte(key + "." + value))
 	result := hsha1.Sum(nil)
 	c.secret = base64.StdEncoding.EncodeToString(result)
 }
