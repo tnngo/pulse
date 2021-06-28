@@ -61,11 +61,11 @@ func New(network string, addr string) *Client {
 
 func (c *Client) Dial() {
 	if c.heartRate == 0 {
-		c.heartRate = 30 * time.Second
+		c.heartRate = 2 * time.Minute
 	}
 
 	if c.readTimeOut == 0 {
-		c.readTimeOut = c.heartRate + 30*time.Second
+		c.readTimeOut = 5 * time.Minute
 	}
 	go c.dial()
 }
