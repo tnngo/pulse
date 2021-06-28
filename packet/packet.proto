@@ -45,9 +45,6 @@ message Packet {
     Type type = 1;
     // Unique identification of device terminal.
     string udid = 2;
-    // Sometimes the same type of device will have different business scenarios, 
-    // so the applications in the device will be named differently.
-    string app_name = 3;
     /** Basic header field. End**/
 
     /** Auth. Begin**/
