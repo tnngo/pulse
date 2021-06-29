@@ -209,18 +209,15 @@ func (pl *Pulse) handle(netconn net.Conn) {
 					pAck := new(packet.Packet)
 					pAck.Type = packet.Type_CONNACK
 					pAck.Udid = p.Udid
+					var tmpErr error
 					if pl.callConnectFunc != nil {
 						repMsg, err := pl.callConnectFunc(ctx, p.Msg)
-						if err == ErrNotSafeConnection {
-							log.L().Warn(ErrNotSafeConnection.Error(), zap.String("remote_addr", netconn.RemoteAddr().String()), zap.String("network", netconn.RemoteAddr().Network()))
-							netconn.Close()
-							return
-						}
 						if repMsg != nil {
 							// type connack,
 							// connack type is handled separately.
 							pAck.Msg = repMsg
 						}
+						tmpErr = err
 
 					}
 					rbyte, err := Encode(pAck)
@@ -232,6 +229,11 @@ func (pl *Pulse) handle(netconn net.Conn) {
 					_, err = netconn.Write(rbyte)
 					if err != nil {
 						log.L().Error(err.Error())
+					}
+					if tmpErr == ErrNotSafeConnection {
+						log.L().Warn(ErrNotSafeConnection.Error(), zap.String("remote_addr", netconn.RemoteAddr().String()), zap.String("network", netconn.RemoteAddr().Network()))
+						netconn.Close()
+						return
 					}
 				} else {
 					pl.parse(ctx, netconn, p)
