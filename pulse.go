@@ -196,18 +196,18 @@ func (pl *Pulse) handle(netconn net.Conn) {
 				// 	ctx = pl.setCtxReqId(ctx, p.RequestId)
 				// }
 
-				if p.Type == packet.Type_Connect {
+				if p.Type == packet.Type_CONNECT {
 					// type connect,
 					// connect type is handled separately.
 					ctx = pl.connect(ctx, netconn, p)
 
-					if p.AuthMode == packet.AuthMode_HmacSha1 {
+					if p.AuthMode == packet.AuthMode_HMACSHA1 {
 						ctx = pl.setSecret(ctx, p.Secret)
 					}
 
 					// server to client.
 					pAck := new(packet.Packet)
-					pAck.Type = packet.Type_ConnAck
+					pAck.Type = packet.Type_CONNACK
 					pAck.Udid = p.Udid
 					if pl.callConnectFunc != nil {
 						repMsg, err := pl.callConnectFunc(ctx, p.Msg)
@@ -271,16 +271,16 @@ func (pl *Pulse) connect(ctx context.Context, netconn net.Conn, p *packet.Packet
 
 func (pl *Pulse) parse(ctx context.Context, netconn net.Conn, p *packet.Packet) {
 	switch p.Type {
-	case packet.Type_Ping:
+	case packet.Type_PING:
 		pl.pong(netconn)
-	case packet.Type_RouteMsg:
+	case packet.Type_ROUTE:
 		pl.route(ctx, p)
 	}
 }
 
 func (pl *Pulse) pong(netconn net.Conn) {
 	wp := new(packet.Packet)
-	wp.Type = packet.Type_Pong
+	wp.Type = packet.Type_PONG
 	b, err := Encode(wp)
 	if err != nil {
 		log.L().Error(err.Error())
@@ -290,13 +290,13 @@ func (pl *Pulse) pong(netconn net.Conn) {
 }
 
 func (pl *Pulse) route(ctx context.Context, p *packet.Packet) {
-	if p.RouteMode == packet.RouteMode_Not {
+	if p.RouteMode == packet.RouteMode_NOT {
 		if pl.callNotRouteFunc != nil {
 			pl.callNotRouteFunc(ctx, p.Msg)
 		}
 		return
 	}
-	if p.RouteMode == packet.RouteMode_Dynamic {
+	if p.RouteMode == packet.RouteMode_DYNAMIC {
 		if pl.callDynamicRouteFunc != nil {
 			pl.callDynamicRouteFunc(ctx, p.Route, p.Msg)
 		}

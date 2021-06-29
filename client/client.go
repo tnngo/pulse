@@ -100,14 +100,14 @@ func (c *Client) connect() ([]byte, error) {
 	if c.callConnectFunc != nil {
 		p.Msg = c.callConnectFunc()
 	}
-	if c.authMode == packet.AuthMode_HmacSha1 {
+	if c.authMode == packet.AuthMode_HMACSHA1 {
 		p.Secret = c.secret
 	}
 
 	p.LocalAddr, _ = ip.GetLocalIP()
 
 	p.Udid = c.udid
-	p.Type = packet.Type_Connect
+	p.Type = packet.Type_CONNECT
 
 	return pulse.Encode(p)
 }
@@ -152,7 +152,7 @@ func (c *Client) handle(netconn net.Conn) {
 
 				// type connack,
 				// connack type is handled separately.
-				if p.Type == packet.Type_ConnAck {
+				if p.Type == packet.Type_CONNACK {
 					log.L().Info("successfully connected",
 						zap.String("local_addr", netconn.LocalAddr().String()),
 						zap.String("remote_addr", netconn.RemoteAddr().String()),
@@ -176,7 +176,7 @@ func (c *Client) handle(netconn net.Conn) {
 
 func (c *Client) heartbeat() {
 	p := new(packet.Packet)
-	p.Type = packet.Type_Ping
+	p.Type = packet.Type_PING
 	b, _ := pulse.Encode(p)
 
 	for {
@@ -192,21 +192,21 @@ func (c *Client) heartbeat() {
 
 func (c *Client) parse(p *packet.Packet) {
 	switch p.Type {
-	case packet.Type_Pong:
+	case packet.Type_PONG:
 		break
-	case packet.Type_RouteMsg:
+	case packet.Type_ROUTE:
 		c.route(p)
 	}
 }
 
 func (c *Client) route(p *packet.Packet) {
-	if p.RouteMode == packet.RouteMode_Not {
+	if p.RouteMode == packet.RouteMode_NOT {
 		if c.callNotRouteFunc != nil {
 			c.callNotRouteFunc(p.Msg)
 		}
 		return
 	}
-	if p.RouteMode == packet.RouteMode_Dynamic {
+	if p.RouteMode == packet.RouteMode_DYNAMIC {
 		if c.callDynamicRouteFunc != nil {
 			c.callDynamicRouteFunc(p.Route, p.Msg)
 		}
@@ -255,7 +255,7 @@ func (c *Client) writeRoute(id int32, group string, routeMode packet.RouteMode, 
 	}
 
 	p := new(packet.Packet)
-	p.Type = packet.Type_RouteMsg
+	p.Type = packet.Type_ROUTE
 	p.RouteMode = routeMode
 	p.Route = new(packet.Route)
 	p.Route.Id = id
@@ -296,21 +296,21 @@ func (c *Client) CallConnAck(f callConnAckFunc) {
 // Write no routing mode.
 // All data is gathered in the CallNotRoute(...) method in the server.
 func (c *Client) Write(msg *packet.Msg) error {
-	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
+	return c.writeRoute(0, "", packet.RouteMode_NOT, msg)
 }
 
 func (c *Client) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_NORMAL, msg)
 }
 
 func (c *Client) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
+	return c.writeRoute(id, group, packet.RouteMode_NORMAL, msg)
 }
 
 func (c *Client) WriteDynamic(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "", packet.RouteMode_Dynamic, msg)
+	return c.writeRoute(id, "", packet.RouteMode_DYNAMIC, msg)
 }
 
 func (c *Client) WriteDynamicGroup(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_Dynamic, msg)
+	return c.writeRoute(id, group, packet.RouteMode_DYNAMIC, msg)
 }

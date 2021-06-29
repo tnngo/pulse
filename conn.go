@@ -30,7 +30,7 @@ func newConn(netconn net.Conn) *Conn {
 func (c *Conn) writeRoute(id int32, group string, routeMode packet.RouteMode, msg *packet.Msg) error {
 	p := new(packet.Packet)
 	p.Udid = c.udid
-	p.Type = packet.Type_RouteMsg
+	p.Type = packet.Type_ROUTE
 	p.RouteMode = routeMode
 
 	p.Route = new(packet.Route)
@@ -72,21 +72,21 @@ func (c *Conn) ConnectTime() int64 {
 }
 
 func (c *Conn) Write(msg *packet.Msg) error {
-	return c.writeRoute(0, "", packet.RouteMode_Not, msg)
+	return c.writeRoute(0, "", packet.RouteMode_NOT, msg)
 }
 
 func (c *Conn) WriteRoute(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "pulse", packet.RouteMode_Normal, msg)
+	return c.writeRoute(id, "pulse", packet.RouteMode_NORMAL, msg)
 }
 
 func (c *Conn) WriteRouteGroup(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_Normal, msg)
+	return c.writeRoute(id, group, packet.RouteMode_NORMAL, msg)
 }
 
 func (c *Conn) WriteDynamic(id int32, msg *packet.Msg) error {
-	return c.writeRoute(id, "", packet.RouteMode_Dynamic, msg)
+	return c.writeRoute(id, "", packet.RouteMode_DYNAMIC, msg)
 }
 
 func (c *Conn) WriteDynamicGroup(id int32, group string, msg *packet.Msg) error {
-	return c.writeRoute(id, group, packet.RouteMode_Dynamic, msg)
+	return c.writeRoute(id, group, packet.RouteMode_DYNAMIC, msg)
 }
